@@ -1,0 +1,15 @@
+node_modules/
+*.json
+!package.json
+!package-lock.json
+auth.json
+auth.json.example
+!D2LOriginal/.gitkeep
+!D2LProcessing/.gitkeep
+D2LOriginal/*
+D2LProcessing/*
+coverage/
+.nyc_output/
+documentation/commands.md
+documentation/Getting Started.md
+documentation/Writing Tests.md
