@@ -9,7 +9,7 @@ var templates = [
     require('action-series-module-items'),
 ];
 
-/* Universal grandchildren actions */
+/* Universal item actions */
 var universal = [
     require('./actions/universal-styling-div.js'),
     require('./actions/universal-rename.js'),
@@ -67,7 +67,7 @@ module.exports = (course, stepCallback) => {
         });
     }
 
-    asyncLib.series(templates, runSeries, (err) => {
+    asyncLib.eachSeries(templates, runSeries, (err) => {
         if (err) {
             stepCallback(err);
         } else {

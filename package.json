@@ -1,29 +1,32 @@
 {
-    "name": "action-series-master",
-    "version": "1.0.0",
-    "description": "Identifies issues with pages in Canvas that don't meet standards, and corrects them if possible.",
-    "main": "main.js",
-    "dependencies": {
-        "canvas-wrapper": "git+https://github.com/byuitechops/Canvas-wrapper"
-    },
-    "devDependencies": {
-        "async": "^2.6.0",
-        "child-development-kit": "github:byuitechops/child-development-kit",
-        "tap": "^10.7.3"
-    },
-    "scripts": {
-        "start": "node ./node_modules/child-development-kit/runChild.js",
-        "test": "tap ./node_modules/child-development-kit/testChild.js -T"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/byuitechops/page-standards.git"
-    },
-    "author": "Zachary Williams, Daniel Green",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/byuitechops/page-standards/issues"
-    },
-    "homepage": "https://github.com/byuitechops/page-standards#readme",
-    "childType": "postImport"
+  "name": "action-series-master",
+  "version": "1.0.0",
+  "description": "Identifies issues with pages in Canvas that don't meet standards, and corrects them if possible.",
+  "main": "main.js",
+  "dependencies": {
+    "action-series-module-items": "github:byuitechops/action-series-module-items",
+    "action-series-pages": "github:byuitechops/action-series-pages",
+    "async": "^2.6.0",
+    "canvas-wrapper": "git+https://github.com/byuitechops/Canvas-wrapper.git"
+  },
+  "devDependencies": {
+    "async": "^2.6.0",
+    "child-development-kit": "github:byuitechops/child-development-kit",
+    "tap": "^10.7.3"
+  },
+  "scripts": {
+    "start": "node ./node_modules/child-development-kit/runChild.js",
+    "test": "tap ./node_modules/child-development-kit/testChild.js -T"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/byuitechops/action-series-master.git"
+  },
+  "author": "Zachary Williams, Daniel Green",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/byuitechops/action-series-master/issues"
+  },
+  "homepage": "https://github.com/byuitechops/action-series-master#readme",
+  "childType": "postImport"
 }
