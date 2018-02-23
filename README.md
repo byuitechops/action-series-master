@@ -1,5 +1,5 @@
 # Child Module Title
-### *Package Name*: page-standards
+### *Package Name*: action-series-master
 ### *Child Type*: Post Import
 ### *Platform*: Online 
 ### *Required*: Required
@@ -8,12 +8,14 @@ This child module is built to be used by the Brigham Young University - Idaho D2
 
 ## Purpose
 
-There is a long list of standards pages need to meet - in title, content, html, javascript, etc. Many of those standards changed when Canvas was brought on as our LMS. This child module attempts to fix issues where pages don't meet certain standards. It also handles situations where the page is no longer needed, needs it's content replaced, and similar concepts. It handles a large variety of page fixes and changes.
+This module abstracts the pattern used by the action-series model.
+
+The action-series model takes a single object returned by a GET request and puts it through a series of submodules, each containing a condition and an action. If the condition passes, the action is committed on the object, and then passed on. If the condition fails, the action is not ran and the object is passed on to the next submodule. When all of the submodules have completed, the object is then converted into a PUT object, and then sent to Canvas to implement the new changes to the object. This model prevents the need for additional API calls, prevents many module coordination issues, and speeds up the conversion process.
 
 ## How to Install
 
 ```
-npm install page-standards
+npm install action-series-master
 ```
 
 ## Run Requirements
@@ -22,7 +24,7 @@ None
 
 ## Options
 
-None so far.
+None
 
 ## Outputs
 
@@ -30,32 +32,12 @@ None
 
 ## Process
 
-Describe in steps how the module accomplishes its goals.
-
-1. Retrieves pages from the Canvas course
-2. Runs each page through a series of tests
-3. If it passes a test (i.e. is a page that needs to be deleted) the related action is enacted upon the page
-4. The page is updated on Canvas
+This module takes in a series of "templtes" (action-series-pages, action-series-discussions, action-series-quizzes, etc.) and runs an asynchronous forEach on them. Each template provides methods and data used to complete the action-series model. Since retrieving quizzes and updating quizzes is a different format than retrieving pages and updating pages in Canvas, it has been left to the template to provide the methods to do so. action-series-master just contains the action-series pattern and enacts it using each template.
 
 ## Log Categories
 
-List the categories used in logging data in your module.
-
-- Pages Deleted in Canvas
-- Page Standards Implemented
+Please review the documentation for each action-series template.
 
 ## Requirements
 
-Needs to be able to handle a large series of tests, each with a corresponding reaction should a page pass the test. Each test fulfills a requirement.
-
-1. Delete specified pages
-2. Rename pages that do not meet new naming conventions
-3. Switch out "Lesson" to "Week" where context suggests we can
-4. Removes banner image if not an overview page
-5. Report images that do not have an alt image
-6. Fix external links that do not open in a new tab ("target" attribute set to "_blank")
-7. If not already in place, wrap the contents of the page in the new styling div
-8. If a broken dropbox link is in the page, point it to the correct place
-9. Rename "Setup Notes for Development Team" to "-Setup Notes & Course Settings"
-10. Remove empty HTML tags that have no purpose (no class, ID, or content)
-11. Remove extra HTML if applicable (this needs more detail)
+Please review the documentation for each action-series template.
