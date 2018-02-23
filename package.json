@@ -4,6 +4,7 @@
   "description": "Identifies issues with pages in Canvas that don't meet standards, and corrects them if possible.",
   "main": "main.js",
   "dependencies": {
+    "action-series-files": "github:byuitechops/action-series-files",
     "action-series-module-items": "github:byuitechops/action-series-module-items",
     "action-series-pages": "github:byuitechops/action-series-pages",
     "async": "^2.6.0",

@@ -22,7 +22,7 @@ module.exports = (course, item, callback) => {
 
         item.techops.setHTML(item, $('body').html());
 
-        course.log('Styling HTML Inserted', {
+        course.log(`${item.techops.type} - Styling Div Inserted`, {
             'Title': item.techops.getTitle(item),
             'ID': item.techops.getID(item)
         });

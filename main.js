@@ -7,12 +7,14 @@ const asyncLib = require('async');
 var templates = [
     require('action-series-pages'),
     require('action-series-module-items'),
+    require('action-series-files'),
 ];
 
 /* Universal item actions */
 var universal = [
     require('./actions/universal-styling-div.js'),
     require('./actions/universal-rename.js'),
+    require('./actions/universal-references.js'),
 ];
 
 module.exports = (course, stepCallback) => {
@@ -21,7 +23,7 @@ module.exports = (course, stepCallback) => {
 
         /* After tests/actions have run, PUT the object up to Canvas */
         function putTheItem(item, eachCallback) {
-            template.putItem(course, item, (err, newItem) => {
+            template.putItem(course, item, (err) => {
                 if (err) {
                     eachCallback(err);
                     return;
@@ -69,9 +71,10 @@ module.exports = (course, stepCallback) => {
 
     asyncLib.eachSeries(templates, runSeries, (err) => {
         if (err) {
-            stepCallback(err);
+            console.log(err);
+            stepCallback(err, course);
         } else {
-            stepCallback(null);
+            stepCallback(null, course);
         }
     });
 };

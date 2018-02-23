@@ -11,9 +11,6 @@ module.exports = (course, item, callback) => {
         oldTitle: /setup\s*notes\s*for\s*development\s*team/gi,
         newTitle: '-Setup Notes & Course Settings'
     }, {
-        oldTitle: /setup\s*notes\s*for\s*development\s*team/gi,
-        newTitle: '-Setup Notes & Course Settings'
-    }, {
         oldTitle: /library\s*research\s*guide/gi,
         newTitle: 'Library Research Guides'
     }, {
@@ -31,7 +28,7 @@ module.exports = (course, item, callback) => {
     function action() {
         var oldTitle = item.techops.getTitle(item);
         item.techops.setTitle(item, found.newTitle);
-        course.log(`Renamed ${item.techops.type}`, {
+        course.log(`${item.techops.type} - Renamed`, {
             'Old Title': oldTitle,
             'New Title': item.techops.getTitle(item),
             'ID': item.techops.getID(item)

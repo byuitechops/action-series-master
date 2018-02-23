@@ -1,0 +1,55 @@
+module.exports = (course, item, callback) => {
+
+    /* This is the action that happens if the test is passed */
+    function action() {
+
+        var references = [{
+            reg: /!\[CDATA[\s\S]*\]\]/gi,
+            type: 'Javascript'
+        }, {
+            reg: /(brightspace)(?!\.com)/gi,
+            type: 'Brightspace References'
+        }, {
+            reg: /brainhoney/ig,
+            type: 'Brainhoney References'
+        }, {
+            reg: /adobe\s*connect/ig,
+            type: 'Adobe Connect References'
+        }, {
+            reg: /((google\s*)?hangouts?(\s*on\s*air)?)|(HOA)/ig,
+            type: 'Hangouts on Air References'
+        }, {
+            reg: /\<a[^\>]*href=("|')[^"']*\.swf("|')\s*\>/ig,
+            type: 'Brainhoney References'
+        }, {
+            reg: /\<style\>/g,
+            type: 'Inline Styling'
+        }];
+
+        /* Check each regex to see if the item contents has any matches */
+        references.forEach(ref => {
+            /* Get all the matches */
+            var matches = item.techops.getHTML(item).match(ref.reg);
+            /* See if it contains any of what we're looking for... */
+            if (matches != null) {
+                matches.forEach(match => {
+                    course.log(`${item.techops.type} - Contains ${ref.type}`, {
+                        'Title': item.techops.getTitle(item),
+                        'ID': item.techops.getID(item),
+                        'Match': match
+                    });
+                });
+            }
+        });
+
+        callback(null, course, item);
+    }
+
+    /* If the item is marked for deletion, do nothing */
+    if (item.techops.delete == true || item.techops.getHTML(item) == null) {
+        callback(null, course, item);
+        return;
+    } else {
+        action();
+    }
+};
