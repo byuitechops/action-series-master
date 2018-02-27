@@ -8,6 +8,7 @@ var templates = [
     require('action-series-pages'),
     require('action-series-module-items'),
     require('action-series-files'),
+    require('action-series-modules'),
 ];
 
 /* Universal item actions */

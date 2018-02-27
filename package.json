@@ -7,6 +7,7 @@
     "action-series-files": "github:byuitechops/action-series-files",
     "action-series-module-items": "github:byuitechops/action-series-module-items",
     "action-series-pages": "github:byuitechops/action-series-pages",
+    "action-series-modules": "github:byuitechops/action-series-modules",
     "async": "^2.6.0",
     "canvas-wrapper": "git+https://github.com/byuitechops/Canvas-wrapper.git"
   },
