@@ -9,6 +9,9 @@ var templates = [
     require('action-series-module-items'),
     require('action-series-files'),
     require('action-series-modules'),
+    require('action-series-assignments'),
+    require('action-series-discussions'),
+    require('action-series-quizzes'),
 ];
 
 /* Universal item actions */
