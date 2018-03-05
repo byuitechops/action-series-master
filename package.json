@@ -11,7 +11,7 @@
     "action-series-assignments": "github:byuitechops/action-series-assignments",
     "action-series-discussions": "github:byuitechops/action-series-discussions",
     "action-series-quizzes": "github:byuitechops/action-series-quizzes",
-    "action-series-quiz-qustions": "github:byuitechops/action-series-quiz-qustions",
+    "action-series-quiz-questions": "github:byuitechops/action-series-quiz-questions",
     "async": "^2.6.0",
     "canvas-wrapper": "git+https://github.com/byuitechops/Canvas-wrapper.git"
   },
