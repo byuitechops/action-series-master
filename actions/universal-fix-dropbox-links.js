@@ -1,10 +1,7 @@
 const asyncLib = require('async');
 const cheerio = require('cheerio');
 var xmlAssignments = [];
-<<<<<<< HEAD
 var canvasAssignments = [];
-=======
->>>>>>> 8d7686bbdcfccd3ad2c102177f1a6710906a76a0
 
 /************POLLYFILLS********/
 
@@ -13,7 +10,6 @@ Array.prototype.isEmpty = function () {
     return this || this.length < 1
 }
 
-<<<<<<< HEAD
 //perform a *destructive* deep copy from one array to another
 //working example: https://jsfiddle.net/jnpscauo/8/
 Array.prototype.deepCopy = function(arr) {
@@ -22,8 +18,6 @@ Array.prototype.deepCopy = function(arr) {
     return this.push(arr.splice(0));
 }
 
-=======
->>>>>>> 8d7686bbdcfccd3ad2c102177f1a6710906a76a0
 module.exports = (course, item, callback) => {
 
     var itemDropboxLink = false;
@@ -44,11 +38,7 @@ module.exports = (course, item, callback) => {
     ******************************************************************/
     function beginProcess() {
         var functions = [
-<<<<<<< HEAD
             checkArrays,
-=======
-            buildXMLArray,
->>>>>>> 8d7686bbdcfccd3ad2c102177f1a6710906a76a0
             parseItem,
             getCorrectLinks,
         ];
@@ -89,7 +79,6 @@ module.exports = (course, item, callback) => {
             constructXMLAssigments();
         }
 
-<<<<<<< HEAD
         if (canvasAssignments.isEmpty()) {
             constructCanvasAssignments((err) => {
                 if (err) {
@@ -115,9 +104,6 @@ module.exports = (course, item, callback) => {
         });
 
         constructCanvasAssignmentsCallback(null);
-=======
-        buildXMLArrayCallback(null);
->>>>>>> 8d7686bbdcfccd3ad2c102177f1a6710906a76a0
     }
 
     /****************************************************************
@@ -233,7 +219,6 @@ module.exports = (course, item, callback) => {
     function getCorrectLinks(itemProperties, getCorrectLinksCallback) {
         var brokenLinks = [];
 
-<<<<<<< HEAD
         //there may be multiple broken dropbox links on the same page.
         asyncLib.each(itemProperties, (page, eachCallback) => {
             var newUrl = '';
@@ -254,33 +239,6 @@ module.exports = (course, item, callback) => {
 
             if (newUrl === '' || typeof newUrl !== "undefined") {
                 course.error(`${item.getTitle()}. Assignment not found. Please check the course then try again.`);
-=======
-        //should only iterate once because there is only one object in the array
-        asyncLib.each(itemProperties, (page, eachCallback) => {
-            var newUrl = '';
-
-            canvas.get(`/api/v1/courses/${course.info.canvasOU}/assignments?search_term=${page.d2l.name}`, (getErr, assignments) => {
-                if (getErr) {
-                    eachCallback(getErr);
-                    return;
-                }
-
-                if (assignments.length > 1) {
-                    assignments.forEach((assignment) => {
-                        if (assignment.name === page.d2l.name) {
-                            newUrl = assignment.html_url;
-                        }
-                    });
-                } else {
-                    if (assignments[0].name === page.d2l.name) {
-                        newUrl = assignments[0].html_url;
-                    }
-                }
-            });
-
-            if (newUrl === '' || typeof newUrl !== "undefined") {
-                course.error(`${item.getTitle()}. Assignment not found. Please check the course.`);
->>>>>>> 8d7686bbdcfccd3ad2c102177f1a6710906a76a0
                 callback(null, course, item);
                 return;
             } 
