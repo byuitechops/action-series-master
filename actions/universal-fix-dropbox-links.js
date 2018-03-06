@@ -1,12 +1,21 @@
 const asyncLib = require('async');
 const cheerio = require('cheerio');
 var xmlAssignments = [];
+var canvasAssignments = [];
 
 /************POLLYFILLS********/
 
 //creating isEmpty array function
 Array.prototype.isEmpty = function () {
     return this || this.length < 1
+}
+
+//perform a *destructive* deep copy from one array to another
+//working example: https://jsfiddle.net/jnpscauo/8/
+Array.prototype.deepCopy = function(arr) {
+    //benchmarks prove that .splice with zero index is the
+    //most efficient way to perform a copy
+    return this.push(arr.splice(0));
 }
 
 module.exports = (course, item, callback) => {
@@ -29,7 +38,7 @@ module.exports = (course, item, callback) => {
     ******************************************************************/
     function beginProcess() {
         var functions = [
-            buildXMLArray,
+            checkArrays,
             parseItem,
             getCorrectLinks,
         ];
@@ -40,22 +49,47 @@ module.exports = (course, item, callback) => {
             }
 
             callback(null, course, item);
-        })
+        });
     }
 
     /****************************************************************
-     * buildXMLArray
+     * checkArrays
      * 
-     * This function happens before the page parsing. This checks to see
-     * if the xmL has been parsed and the object has been built. If it
-     * hasn't, it will then proceed to call the function to build it.
+     * This function needs to happen before everything. This goes through
+     * and ensure that everything has been set up correctly so the program
+     * doesn't have to parse the XML or make API calls 9000 times for the 
+     * entire grandchild module to run. 
     ******************************************************************/
-    function buildXMLArray(buildXMLArrayCallback) {
+    function checkArrays(buildXMLArrayCallback) {
         if (xmlAssignments.isEmpty()) {
             constructXMLAssigments();
         }
 
-        buildXMLArrayCallback(null);
+        if (canvasAssignments.isEmpty()) {
+            constructCanvasAssignments((err) => {
+                if (err) {
+                    buildXMLArrayCallback(err);
+                    return;
+                }
+
+                buildXMLArrayCallback(null);
+            });
+        } else {
+            buildXMLArrayCallback(null);
+        }
+    }
+
+    function constructCanvasAssignments(constructCanvasAssignmentsCallback) {
+        canvas.get(`/api/v1/courses/${course.info.canvasOU}/assignments`, (getErr, assignments) => {
+            if (getErr) {
+                constructCanvasAssignmentsCallback(err);
+                return;
+            } 
+
+            canvasAssignments.deepCopy(assignments);
+        });
+
+        constructCanvasAssignmentsCallback(null);
     }
 
     /****************************************************************
@@ -171,31 +205,26 @@ module.exports = (course, item, callback) => {
     function getCorrectLinks(itemProperties, getCorrectLinksCallback) {
         var brokenLinks = [];
 
-        //should only iterate once because there is only one object in the array
+        //there may be multiple broken dropbox links on the same page.
         asyncLib.each(itemProperties, (page, eachCallback) => {
             var newUrl = '';
 
-            canvas.get(`/api/v1/courses/${course.info.canvasOU}/assignments?search_term=${page.d2l.name}`, (getErr, assignments) => {
-                if (getErr) {
-                    eachCallback(getErr);
-                    return;
-                }
-
-                if (assignments.length > 1) {
-                    assignments.forEach((assignment) => {
-                        if (assignment.name === page.d2l.name) {
-                            newUrl = assignment.html_url;
-                        }
-                    });
+            asyncLib.each(canvasAssignments, (canvasAssignment, innerEachCallback) => {
+                if (canvasAssignment.name === page.d2l.name) {
+                    newUrl = assignment.html_url;
+                    innerEachCallback(null);
                 } else {
-                    if (assignments[0].name === page.d2l.name) {
-                        newUrl = assignments[0].html_url;
-                    }
+                    innerEachCallback(null);
+                }
+            }, (innerEachErr) => {
+                if (innerEachErr) {
+                    eachCallback(innerEachErr);
+                    return;
                 }
             });
 
             if (newUrl === '' || typeof newUrl !== "undefined") {
-                course.error(`${item.getTitle()}. Assignment not found. Please check the course.`);
+                course.error(`${item.getTitle()}. Assignment not found. Please check the course then try again.`);
                 callback(null, course, item);
                 return;
             } 
