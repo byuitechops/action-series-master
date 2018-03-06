@@ -49,7 +49,6 @@ module.exports = (course, item, callback) => {
             }
 
             callback(null, course, item);
-<<<<<<< HEAD
         });
     }
 
@@ -62,19 +61,6 @@ module.exports = (course, item, callback) => {
      * entire grandchild module to run. 
     ******************************************************************/
     function checkArrays(buildXMLArrayCallback) {
-=======
-        })
-    }
-
-    /****************************************************************
-     * buildXMLArray
-     * 
-     * This function happens before the page parsing. This checks to see
-     * if the xmL has been parsed and the object has been built. If it
-     * hasn't, it will then proceed to call the function to build it.
-    ******************************************************************/
-    function buildXMLArray(buildXMLArrayCallback) {
->>>>>>> 8d7686bbdcfccd3ad2c102177f1a6710906a76a0
         if (xmlAssignments.isEmpty()) {
             constructXMLAssigments();
         }
