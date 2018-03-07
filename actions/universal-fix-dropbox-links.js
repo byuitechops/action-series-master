@@ -14,7 +14,7 @@ Array.prototype.clone = function(arr) {
     //benchmarks prove that .splice with zero index is the
     //most efficient way to perform a copy
     //https://jsperf.com/new-array-vs-splice-vs-slice/19
-    if (arr instanceof 'Array') {
+    if (arr instanceof Array) {
         return this.push(arr.splice(0));
     } else {
         throw "ERROR: ${arr} is not an array.";
