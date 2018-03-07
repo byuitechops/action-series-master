@@ -3,19 +3,22 @@ const cheerio = require('cheerio');
 var xmlAssignments = [];
 var canvasAssignments = [];
 
-/************POLLYFILLS********/
-
-//creating isEmpty array function
+//returns a boolean value on the emptiness of the array
 Array.prototype.isEmpty = function () {
     return this || this.length < 1
 }
 
 //perform a *destructive* deep copy from one array to another
-//working example: https://jsfiddle.net/jnpscauo/8/
-Array.prototype.deepCopy = function(arr) {
+//working example: https://jsfiddle.net/jnpscauo/12/
+Array.prototype.clone = function(arr) {
     //benchmarks prove that .splice with zero index is the
     //most efficient way to perform a copy
-    return this.push(arr.splice(0));
+    //https://jsperf.com/new-array-vs-splice-vs-slice/19
+    if (arr instanceof 'Array') {
+        return this.push(arr.splice(0));
+    } else {
+        throw "ERROR: ${arr} is not an array.";
+    }
 }
 
 module.exports = (course, item, callback) => {
@@ -41,6 +44,7 @@ module.exports = (course, item, callback) => {
             checkArrays,
             parseItem,
             getCorrectLinks,
+            repairLinks,
         ];
 
         asyncLib.waterfall(functions, (waterfallErr) => {
@@ -54,6 +58,8 @@ module.exports = (course, item, callback) => {
 
     /****************************************************************
      * checkArrays
+     * 
+     * @param buildXMLArrayCallback - callback
      * 
      * This function needs to happen before everything. This goes through
      * and ensure that everything has been set up correctly so the program
@@ -79,21 +85,39 @@ module.exports = (course, item, callback) => {
         }
     }
 
+    /****************************************************************
+     * constructCanvasAssignments
+     * 
+     * @param constructCanvasAssignmentsCallback - callback
+     * 
+     * At this point, we already know that the canvasAssignments array
+     * is already empty so we make an API call to retrieve an array 
+     * of all the assignments in the course. This helps reduce the need
+     * for API calls down to 1 for this entire grandchild.
+    ******************************************************************/
     function constructCanvasAssignments(constructCanvasAssignmentsCallback) {
         canvas.get(`/api/v1/courses/${course.info.canvasOU}/assignments`, (getErr, assignments) => {
             if (getErr) {
                 constructCanvasAssignmentsCallback(err);
                 return;
             } 
+            
+            try {
+                //move the contents from the assignments to canvasAssignments array
+                canvasAssignments.clone(assignments);
+            } catch(e) {
+                course.error(e);
+            }
 
-            canvasAssignments.deepCopy(assignments);
+            course.message(`Successfully retrieved all assignmnets from canvas and is now stored on canvasAssignments.`);
+            constructCanvasAssignmentsCallback(null);
         });
-
-        constructCanvasAssignmentsCallback(null);
     }
 
     /****************************************************************
      * parseItem
+     * 
+     * @param parseItemCallback - callback
      * 
      * This function goes through and parses the page's body. This 
      * function utilizes cheerio to grab all of the links and analyze
@@ -109,7 +133,7 @@ module.exports = (course, item, callback) => {
 
         //no links are found on the page. call the callback to exit out of grandchild
         if (links.length < 0) {
-            course.message(`${item.getTitle()}: no links found. Closing out of module.`)
+            course.message(`${item.getTitle()}: no links found.`);
             callback(null, course, item);
         //links are found. let's check each to see if they are dropbox links
         } else {
@@ -130,13 +154,19 @@ module.exports = (course, item, callback) => {
                     if (url.includes('drop_box')) {
                         var srcId = url.split('drop_box_').pop();
                         
+                        //identify which XML portion is for which dropbox. 
+                        //this is how the matching is done
                         matchXMLAssignments(url, srcId, (matchXMLAssignmentsErr, itemProperties) => {
                             if (matchXMLAssignmentsErr) {
                                 parseItem(matchXMLAssignmentsErr);
                                 return;
                             }
 
-                            itemPropertiesArray = itemProperties;
+                            try {
+                                itemPropertiesArray.clone(itemProperties);
+                            } catch(e) {
+                                course.error(e);
+                            }
                         });
                     }
 
@@ -150,7 +180,7 @@ module.exports = (course, item, callback) => {
             //links are present in the page but none are dropbox links. 
             //call the callback to exit out of grandchild.
             } else {
-                course.message(`${item.getTitle()}: no dropbox links found. Closing out of module.`);
+                course.message(`${item.getTitle()}: links present but no dropbox links found.`);
                 callback(null, course, item);
             }
 
@@ -160,6 +190,10 @@ module.exports = (course, item, callback) => {
 
     /****************************************************************
      * matchXMLAssignments
+     * 
+     * @param - url string
+     * @param - srcId int
+     * @param matchXMLAssignmentsCallback - callback
      * 
      * This function goes through all of the xmlAssignments and check to 
      * see if the srcId matches any of them. If it matches, I pull the 
@@ -198,6 +232,9 @@ module.exports = (course, item, callback) => {
 
     /****************************************************************
      * getCorrectLinks
+     * 
+     * @param itemProperties - array => srcId int, d2l XML obj, url string
+     * @param getCorrectLinksCallback - callback
      * 
      * This function makes an API call to the assignments to obtain the
      * correct url for the dropbox.
@@ -243,7 +280,45 @@ module.exports = (course, item, callback) => {
                 return;
             }
 
-            getCorrectLinksCallback(null);
+            getCorrectLinksCallback(null, brokenLinks);
+        });
+    }
+
+    /****************************************************************
+     * repairLinks
+     *
+     * @param brokenLinks - array => badLink string, newLink string
+     * @param repairLinksCallback - callback
+     *  
+     * This function goes through and fixes all of the dropbox links
+     * inside brokenLinks array.
+    ******************************************************************/
+    function repairLinks(brokenLinks, repairLinksCallback) {
+        var title = item.getTitle();
+
+        asyncLib.each(brokenLinks, (brokenLink, eachCallback) => {
+            var $ = cheerio.load(item.getHTML());
+            var links = $('a');
+
+            //this fixes all of the occurrences of the same link 
+            brokenLink.forEach((item) => {
+                links.attr('href', (index, link) => {
+                    return link.replace(item.badLink, item.newLink);
+                });
+
+                course.log(`universal-fix-dropbox-links`, {
+                    'badLink': item.badLink,
+                    'newLink': item.newLink,
+                    'page': title,
+                });
+            });        
+        }, (eachErr) => {
+            if (eachErr) {
+                repairLinksCallback(eachErr);
+                return;
+            }
+
+            repairLinksCallback(null);
         });
     }
 
