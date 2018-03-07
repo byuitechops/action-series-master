@@ -16,6 +16,8 @@ Array.prototype.clone = function(arr) {
     //https://jsperf.com/new-array-vs-splice-vs-slice/19
     if (arr instanceof Array) {
         return this.push(arr.splice(0));
+    } else if (typeof arr === "undefined") {
+        throw "ERROR: the array you are trying to clone is undefined.";
     } else {
         throw "ERROR: ${arr} is not an array.";
     }
@@ -26,7 +28,7 @@ module.exports = (course, item, callback) => {
     var itemDropboxLink = false;
 
     //no need to check items that will be deleted
-    if (item.techops.delete === true || item.techops.getHTML === null) {
+    if (item.techops.delete === true || item.techops.getHTML() === null) {
         callback(null, course, item);
         return;
     } else {
