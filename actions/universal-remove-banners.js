@@ -11,7 +11,7 @@ module.exports = (course, item, callback) => {
         //taken out of the page.
         var changeBool = false;
 
-        if (images < 0) {
+        if (images.length < 0) {
             callback(null, course, item);
         } else {
             images.each((index, image) => {
