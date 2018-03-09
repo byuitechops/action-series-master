@@ -12,7 +12,7 @@ var templates = [
     require('action-series-assignments'),
     require('action-series-discussions'),
     require('action-series-quizzes'),
-    require('action-series-quiz-questions',)
+    require('action-series-quiz-questions'),
 ];
 
 /* Universal item actions */
@@ -42,6 +42,9 @@ module.exports = (course, stepCallback) => {
         /* Run each of the tests on an individual item */
         function runTests(item, eachCallback) {
 
+            /* Copy of the item so we can see if any changes were made in the grandchildren modules*/
+            var originalItem = Object.assign({}, item);
+
             /* Builds a full list of all the actions to run on the item.
              * The first function is just to inject the needed values into the waterfall.
              * "universal" adds in the grandchildren that need to run on every category.
@@ -53,7 +56,16 @@ module.exports = (course, stepCallback) => {
                     eachCallback(waterErr);
                     return;
                 }
-                putTheItem(finalItem, eachCallback);
+
+                /* Compare the original to the finalItem to see if we need to update it in Canvas */
+                var diff = Object.keys(finalItem)
+                    .find(key => originalItem[key] !== finalItem[key] || finalItem.techops.delete === true);
+
+                if (diff) {
+                    putTheItem(finalItem, eachCallback);
+                } else {
+                    eachCallback(null);
+                }
             });
         }
 
