@@ -20,7 +20,7 @@ module.exports = (course, item, callback) => {
             type: 'Hangouts on Air References'
         }, {
             reg: /\<a[^\>]*href=("|')[^"']*\.swf("|')\s*\>/ig,
-            type: 'Brainhoney References'
+            type: '.swf Files'
         }, {
             reg: /\<style\>/g,
             type: 'Inline Styling'

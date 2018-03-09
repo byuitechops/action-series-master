@@ -10,7 +10,7 @@ Array.prototype.isEmpty = function () {
 
 //perform a *destructive* deep copy from one array to another
 //working example: https://jsfiddle.net/jnpscauo/12/
-Array.prototype.clone = function(arr) {
+Array.prototype.clone = function (arr) {
     //benchmarks prove that .splice with zero index is the
     //most efficient way to perform a copy
     //https://jsperf.com/new-array-vs-splice-vs-slice/19
@@ -102,12 +102,12 @@ module.exports = (course, item, callback) => {
             if (getErr) {
                 constructCanvasAssignmentsCallback(err);
                 return;
-            } 
-            
+            }
+
             try {
                 //move the contents from the assignments to canvasAssignments array
                 canvasAssignments.clone(assignments);
-            } catch(e) {
+            } catch (e) {
                 course.error(e);
             }
 
@@ -137,7 +137,7 @@ module.exports = (course, item, callback) => {
         if (links.length < 0) {
             course.message(`${item.getTitle()}: no links found.`);
             callback(null, course, item);
-        //links are found. let's check each to see if they are dropbox links
+            //links are found. let's check each to see if they are dropbox links
         } else {
             $(links).each((index, link) => {
                 if ($(link).attr('href').indexOf('drop_box') != -1) {
@@ -151,11 +151,11 @@ module.exports = (course, item, callback) => {
 
                 asyncLib.each($(links), (link, eachCallback) => {
                     var url = $(link).attr('href');
-                    
+
                     //we know here that the link is a dropbox link.
                     if (url.includes('drop_box')) {
                         var srcId = url.split('drop_box_').pop();
-                        
+
                         //identify which XML portion is for which dropbox. 
                         //this is how the matching is done
                         matchXMLAssignments(url, srcId, (matchXMLAssignmentsErr, itemProperties) => {
@@ -166,7 +166,7 @@ module.exports = (course, item, callback) => {
 
                             try {
                                 itemPropertiesArray.clone(itemProperties);
-                            } catch(e) {
+                            } catch (e) {
                                 course.error(e);
                             }
                         });
@@ -179,8 +179,8 @@ module.exports = (course, item, callback) => {
                         return;
                     }
                 });
-            //links are present in the page but none are dropbox links. 
-            //call the callback to exit out of grandchild.
+                //links are present in the page but none are dropbox links. 
+                //call the callback to exit out of grandchild.
             } else {
                 course.message(`${item.getTitle()}: links present but no dropbox links found.`);
                 callback(null, course, item);
@@ -266,7 +266,7 @@ module.exports = (course, item, callback) => {
                 course.error(`${item.getTitle()}. Assignment not found. Please check the course then try again.`);
                 callback(null, course, item);
                 return;
-            } 
+            }
 
             var obj = {
                 'badLink': page.url,
@@ -308,12 +308,12 @@ module.exports = (course, item, callback) => {
                     return link.replace(item.badLink, item.newLink);
                 });
 
-                course.log(`universal-fix-dropbox-links`, {
+                course.log('Fixed Broken Dropbox Quicklinks', {
                     'badLink': item.badLink,
                     'newLink': item.newLink,
                     'page': title,
                 });
-            });        
+            });
         }, (eachErr) => {
             if (eachErr) {
                 repairLinksCallback(eachErr);

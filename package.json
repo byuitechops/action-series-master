@@ -4,20 +4,20 @@
   "description": "Identifies issues with pages in Canvas that don't meet standards, and corrects them if possible.",
   "main": "main.js",
   "dependencies": {
-    "action-series-files": "github:byuitechops/action-series-files",
-    "action-series-module-items": "github:byuitechops/action-series-module-items",
-    "action-series-pages": "github:byuitechops/action-series-pages",
-    "action-series-modules": "github:byuitechops/action-series-modules",
     "action-series-assignments": "github:byuitechops/action-series-assignments",
     "action-series-discussions": "github:byuitechops/action-series-discussions",
-    "action-series-quizzes": "github:byuitechops/action-series-quizzes",
+    "action-series-files": "github:byuitechops/action-series-files",
+    "action-series-module-items": "github:byuitechops/action-series-module-items",
+    "action-series-modules": "github:byuitechops/action-series-modules",
+    "action-series-pages": "github:byuitechops/action-series-pages",
     "action-series-quiz-questions": "github:byuitechops/action-series-quiz-questions",
+    "action-series-quizzes": "github:byuitechops/action-series-quizzes",
     "async": "^2.6.0",
     "canvas-wrapper": "git+https://github.com/byuitechops/Canvas-wrapper.git"
   },
   "devDependencies": {
     "async": "^2.6.0",
-    "child-development-kit": "github:byuitechops/child-development-kit",
+    "child-development-kit": "git+https://github.com/byuitechops/child-development-kit.git#newCDK",
     "tap": "^10.7.3"
   },
   "scripts": {

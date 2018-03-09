@@ -11,7 +11,7 @@ module.exports = (course, item, callback) => {
             image = $(image);
             var alt = image.attr('alt');
             if (!alt || alt === '') {
-                course.log('Images without alt text', {
+                course.log('Images without Alt Text', {
                     'Filename': `${item.title}`,
                     'Page URL': `https://${course.info.domain}.instructure.com/courses/${course.info.canvasOU}/pages/${item.id}`,
                     'Image Source': `${image.attr('src')}`
