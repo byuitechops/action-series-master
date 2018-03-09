@@ -12,6 +12,7 @@ var templates = [
     require('action-series-assignments'),
     require('action-series-discussions'),
     require('action-series-quizzes'),
+    require('action-series-quiz-questions',)
 ];
 
 /* Universal item actions */
@@ -19,6 +20,8 @@ var universal = [
     require('./actions/universal-styling-div.js'),
     require('./actions/universal-rename.js'),
     require('./actions/universal-references.js'),
+    require('./actions/universal-target-attributes.js'),
+    require('./actions/universal-alt-attribute.js'),
 ];
 
 module.exports = (course, stepCallback) => {
@@ -42,7 +45,7 @@ module.exports = (course, stepCallback) => {
             /* Builds a full list of all the actions to run on the item.
              * The first function is just to inject the needed values into the waterfall.
              * "universal" adds in the grandchildren that need to run on every category.
-             * "template.actions" adds in out the category's grandchildren. */
+             * "template.actions" adds in the category's grandchildren. */
             var actions = [asyncLib.constant(course, item), ...universal, ...template.actions];
 
             asyncLib.waterfall(actions, (waterErr, course, finalItem) => {
@@ -52,7 +55,6 @@ module.exports = (course, stepCallback) => {
                 }
                 putTheItem(finalItem, eachCallback);
             });
-
         }
 
         /* Retrieve items from canvas, then send each to runTest() */
