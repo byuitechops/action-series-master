@@ -31,8 +31,10 @@ module.exports = (course, item, callback) => {
     }
 
 
-    /* If the item is marked for deletion, do nothing */
-    if (item.techops.delete == true || item.techops.getHTML(item) == null) {
+    /* If the item is marked for deletion, has no HTML to work with, or is the front page for the course, do nothing */
+    if (item.techops.delete == true ||
+        item.techops.getHTML(item) == null ||
+        item.techops.type === 'Page' && item.front_page === true) {
         callback(null, course, item);
         return;
     } else {
