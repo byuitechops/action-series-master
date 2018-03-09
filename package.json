@@ -17,11 +17,11 @@
   },
   "devDependencies": {
     "async": "^2.6.0",
-    "child-development-kit": "github:byuitechops/child-development-kit",
+    "child-development-kit": "git+https://github.com/byuitechops/child-development-kit.git#newCDK",
     "tap": "^10.7.3"
   },
   "scripts": {
-    "start": "node ./node_modules/child-development-kit/runChild.js",
+    "start": "node ./node_modules/child-development-kit/runModule.js",
     "test": "tap ./node_modules/child-development-kit/testChild.js -T"
   },
   "repository": {
