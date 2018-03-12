@@ -22,6 +22,7 @@ var universal = [
     require('./actions/universal-references.js'),
     require('./actions/universal-target-attributes.js'),
     require('./actions/universal-alt-attribute.js'),
+    require('./actions/universal-set-external-links.js'),
 ];
 
 module.exports = (course, stepCallback) => {

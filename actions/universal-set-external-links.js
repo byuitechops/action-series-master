@@ -35,44 +35,52 @@ module.exports = (course, item, callback) => {
 
     var $ = cheerio.load(item.techops.getHTML(item));
     var links = $('a').get();
-    var found = undefined;
-
-
+    console.log(`There are ${links.length} links in this item`);
+    console.log(`Those links are:` + links);
+    // var found = undefined;
 
     /* This is the action that happens if the test is passed */
-    function action(link) {
-        item.external_url = item.newUrl;
-        item.new_tab = true;
+    function action(link, newURL) {
+        var oldLink = $(link).attr('href');
+        $(link).attr('href', newURL);
+        $(link).attr('target', '_blank');
 
         course.log(`${item.techops.type} - External Links in HTML Entities Set`, {
             'Title': item.title,
             'ID': item.id,
-            'New URL': item.external_url
+            'Old URL': oldLink,
+            'New URL': newURL,
         });
 
-        callback(null, course, item);
+        // callback(null, course, item);
     }
 
     /* For each external link found, test to see if it matches one that needs to be changed from urlsToChange */
     links.forEach(link => {
-        urlsToChange.forEach(currURL => {
-            if ($(link).attr('href') === currURL.url) {
-                action(link, currURL);
+        urlsToChange.forEach(externalURL => {
+            if ($(link).attr('href') === externalURL.url) {
+                action(link, externalURL.newUrl);
             }
         });
-
-
-        /* If the find function doesn't find anything, we know there isn't a match. */
-        found = urlsToChange.find(currUrl => {
-            currUrl.url.test($(link).attr('href'))
-        });
-
-        /* The test returns TRUE or FALSE - action() is called if true */
-        if (found != undefined) {
-            action(link);
-        } else {
-            callback(null, course, item);
-        }
     });
 
+    /* Set the new html of the put item */
+    item.techops.setHTML(item, $.html());
+    
+    /* Call the callback after running through each link in the item */
+    callback(null, course, item);
 };
+//         /* If the find function doesn't find anything, we know there isn't a match. */
+//         found = urlsToChange.find(currUrl => {
+//             currUrl.url.test($(link).attr('href'))
+//         });
+
+//         /* The test returns TRUE or FALSE - action() is called if true */
+//         if (found != undefined) {
+//             action(link);
+//         } else {
+//             callback(null, course, item);
+//         }
+//     });
+
+// };
