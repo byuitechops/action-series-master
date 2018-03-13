@@ -13,19 +13,21 @@ module.exports = (course, item, callback) => {
 
     /* Potential matches in LOWER case */
     var urlsToChange = [{
+        /* This is an example for the gauntlet. Delete and replace with actual urls */
         url: 'https://www.123test.com/iq-test/',
-        newUrl: 'https:/www.google.com/',
-    }];
+        newUrl: 'https://www.google.com/',
+    },];
 
+    /* If there isn't any html in the item, call the callback */
     if (!item.techops.getHTML(item)) {
         callback(null, course, item);
         return;
     }
 
+    /* Get all of the links in the html */
     var $ = cheerio.load(item.techops.getHTML(item));
     var links = $('a').get();
     console.log(`There are ${links.length} links in this item`);
-    // var found = undefined;
 
     /* This is the action that happens if the test is passed */
     function action(link, newURL) {
@@ -34,15 +36,14 @@ module.exports = (course, item, callback) => {
         $(link).attr('target', '_blank');
 
         course.log(`${item.techops.type} - External Links in HTML Entities Set`, {
-            'Title': item.title,
-            'ID': item.id,
+            'Title': item.techops.getTitle(item),
+            'ID': item.techops.getID(item),
             'Old URL': oldLink,
             'New URL': newURL,
         });
-
-        // callback(null, course, item);
     }
 
+    /* The if statement is the test to run action on each individual link */
     /* For each external link found, test to see if it matches one that needs to be changed from urlsToChange */
     links.forEach(link => {
         urlsToChange.forEach(externalURL => {
@@ -54,21 +55,7 @@ module.exports = (course, item, callback) => {
 
     /* Set the new html of the put item */
     item.techops.setHTML(item, $.html());
-    
+
     /* Call the callback after running through each link in the item */
     callback(null, course, item);
 };
-//         /* If the find function doesn't find anything, we know there isn't a match. */
-//         found = urlsToChange.find(currUrl => {
-//             currUrl.url.test($(link).attr('href'))
-//         });
-
-//         /* The test returns TRUE or FALSE - action() is called if true */
-//         if (found != undefined) {
-//             action(link);
-//         } else {
-//             callback(null, course, item);
-//         }
-//     });
-
-// };
