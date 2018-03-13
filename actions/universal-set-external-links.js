@@ -13,30 +13,18 @@ module.exports = (course, item, callback) => {
 
     /* Potential matches in LOWER case */
     var urlsToChange = [{
-        url: /University\s*Polic/gi,
-        newUrl: 'https://content.byui.edu/integ/gen/d24f576f-d34b-47be-a466-d00bd4792fb6/0/universitypolicies.html'
-    }, {
-        url: /online\s*support\s*center/gi,
-        newUrl: 'https://content.byui.edu/integ/gen/8872d2b2-91d5-4953-a357-3097ef2aa5d0/0/?.vi=file&attachment.uuid=e509c91c-e500-4d6d-9a20-b8ff1b0186f9'
-    }, {
-        url: /library\s*research\s*guide/gi,
-        newUrl: 'https://content.byui.edu/integ/gen/8872d2b2-91d5-4953-a357-3097ef2aa5d0/0/?.vi=file&attachment.uuid=3b1239c4-a857-431b-b633-94d3fdbe396e'
-    }, {
-        url: /academic\s*support\s*center/gi,
-        newUrl: 'https://content.byui.edu/integ/gen/8872d2b2-91d5-4953-a357-3097ef2aa5d0/0/?.vi=file&attachment.uuid=91d9ec86-03ef-4c49-805f-65d488a1085c'
-    }, {
-        url: /copyright\s*(and|&)\s*source\s*/gi,
-        newUrl: 'https://docs.google.com/a/byui.edu/spreadsheets/d/156Y7L6XbeWHpNvK4h1oVpAOTAr141IonyKT_qLeSUZg/edit?usp=sharing'
-    }, {
-        url: /course\s*map|design\s*workbook/gi,
-        newUrl: course.info.designWorkbookURL
+        url: 'https://www.123test.com/iq-test/',
+        newUrl: 'https:/www.google.com/',
     }];
 
+    if (!item.techops.getHTML(item)) {
+        callback(null, course, item);
+        return;
+    }
 
     var $ = cheerio.load(item.techops.getHTML(item));
     var links = $('a').get();
     console.log(`There are ${links.length} links in this item`);
-    console.log(`Those links are:` + links);
     // var found = undefined;
 
     /* This is the action that happens if the test is passed */
