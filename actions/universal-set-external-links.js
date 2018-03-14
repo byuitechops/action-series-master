@@ -27,7 +27,6 @@ module.exports = (course, item, callback) => {
     /* Get all of the links in the html */
     var $ = cheerio.load(item.techops.getHTML(item));
     var links = $('a').get();
-    console.log(`There are ${links.length} links in this item`);
 
     /* This is the action that happens if the test is passed */
     function action(link, newURL) {
