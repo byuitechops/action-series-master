@@ -27,7 +27,6 @@ module.exports = (course, item, callback) => {
     /* Get all of the links in the html */
     var $ = cheerio.load(item.techops.getHTML(item));
     var links = $('a').get();
-    console.log(`There are ${links.length} links in this item`);
 
     /* This is the action that happens if the test is passed */
     function action(link, newURL) {
@@ -35,7 +34,7 @@ module.exports = (course, item, callback) => {
         $(link).attr('href', newURL);
         $(link).attr('target', '_blank');
 
-        course.log(`${item.techops.type} - External Links in HTML Entities Set`, {
+        item.techops.log(`${item.techops.type} - External Links in HTML Entities Set`, {
             'Title': item.techops.getTitle(item),
             'ID': item.techops.getID(item),
             'Old URL': oldLink,
