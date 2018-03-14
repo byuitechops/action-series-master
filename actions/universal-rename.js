@@ -26,12 +26,23 @@ module.exports = (course, item, callback) => {
 
     /* This is the action that happens if the test is passed */
     function action() {
-        var oldTitle = item.techops.getTitle(item);
-        item.techops.setTitle(item, found.newTitle);
-        course.log(`${item.techops.type} - Renamed`, {
-            'Old Title': oldTitle,
-            'New Title': item.techops.getTitle(item),
-            'ID': item.techops.getID(item)
+        let oldTitle = item.techops.getTitle(item);
+        let newTitle = found.newTitle;
+        let itemID = item.techops.getID(item);
+        let logCategory = 'Renamed';
+
+        /* If we're running a standards check and not doing any changes... */
+        if (course.info.checkStandards === true) {
+            logCategory = 'Needs to be Renamed';
+        } else {
+            item.techops.setTitle(item, found.newTitle);
+        }
+
+        course.log(logCategory, {
+            'Type': item.techops.type,
+            'Current Title': oldTitle,
+            'New Title': newTitle,
+            'ID': itemID
         });
         callback(null, course, item);
     }
