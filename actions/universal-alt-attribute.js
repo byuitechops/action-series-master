@@ -24,7 +24,7 @@ module.exports = (course, item, callback) => {
 
 
     /* If the item is marked for deletion, do nothing */
-    if (item.techops.delete == true || item.techops.getHTML(item) == null) {
+    if (item.techops.delete === true || item.techops.getHTML(item) === null) {
         callback(null, course, item);
         return;
     } else {
