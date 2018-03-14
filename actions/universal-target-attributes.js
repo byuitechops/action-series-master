@@ -21,7 +21,7 @@ module.exports = (course, item, callback) => {
                         $(link).attr('target', '_blank');
 
                         /* Log it to the console and our report */
-                        course.log(`${item.techops.type} - External Link Target Attribute Set to _blank`, {
+                        item.techops.log(`${item.techops.type} - External Link Target Attribute Set to _blank`, {
                             'Title': item.techops.getTitle(item),
                             'ID': item.techops.getID(item),
                             'URL': $(link).attr('href'),

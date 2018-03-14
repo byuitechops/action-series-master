@@ -33,7 +33,7 @@ module.exports = (course, item, callback) => {
             /* See if it contains any of what we're looking for... */
             if (matches != null) {
                 matches.forEach(match => {
-                    course.log(`${item.techops.type} - Contains ${ref.type}`, {
+                    item.techops.log(`${item.techops.type} - Contains ${ref.type}`, {
                         'Title': item.techops.getTitle(item),
                         'ID': item.techops.getID(item),
                         'Match': match

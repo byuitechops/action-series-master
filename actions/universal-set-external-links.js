@@ -35,7 +35,7 @@ module.exports = (course, item, callback) => {
         $(link).attr('href', newURL);
         $(link).attr('target', '_blank');
 
-        course.log(`${item.techops.type} - External Links in HTML Entities Set`, {
+        item.techops.log(`${item.techops.type} - External Links in HTML Entities Set`, {
             'Title': item.techops.getTitle(item),
             'ID': item.techops.getID(item),
             'Old URL': oldLink,

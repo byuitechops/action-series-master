@@ -6,23 +6,23 @@ const asyncLib = require('async');
 /* Templates */
 var templates = [
     require('action-series-pages'),
-    require('action-series-module-items'),
-    require('action-series-files'),
-    require('action-series-modules'),
-    require('action-series-assignments'),
-    require('action-series-discussions'),
-    require('action-series-quizzes'),
-    require('action-series-quiz-questions'),
+    // require('action-series-module-items'),
+    // require('action-series-files'),
+    // require('action-series-modules'),
+    // require('action-series-assignments'),
+    // require('action-series-discussions'),
+    // require('action-series-quizzes'),
+    // require('action-series-quiz-questions'),
 ];
 
 /* Universal item actions */
 var universal = [
     require('./actions/universal-styling-div.js'),
-    require('./actions/universal-rename.js'),
-    require('./actions/universal-references.js'),
-    require('./actions/universal-target-attributes.js'),
-    require('./actions/universal-alt-attribute.js'),
-    require('./actions/universal-set-external-links.js'),
+    // require('./actions/universal-rename.js'),
+    // require('./actions/universal-references.js'),
+    // require('./actions/universal-target-attributes.js'),
+    // require('./actions/universal-alt-attribute.js'),
+    // require('./actions/universal-set-external-links.js'),
 ];
 
 module.exports = (course, stepCallback) => {
@@ -36,6 +36,9 @@ module.exports = (course, stepCallback) => {
                     eachCallback(err);
                     return;
                 }
+                item.techops.logs.forEach(log => {
+                    course.log(log.title, log.details);
+                });
                 eachCallback(null);
             });
         }

@@ -308,7 +308,7 @@ module.exports = (course, item, callback) => {
                     return link.replace(item.badLink, item.newLink);
                 });
 
-                course.log('Fixed Broken Dropbox Quicklinks', {
+                item.techops.log('Fixed Broken Dropbox Quicklinks', {
                     'badLink': item.badLink,
                     'newLink': item.newLink,
                     'page': title,
