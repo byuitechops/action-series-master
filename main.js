@@ -23,6 +23,8 @@ var universal = [
     require('./actions/universal-target-attributes.js'),
     require('./actions/universal-alt-attribute.js'),
     require('./actions/universal-set-external-links.js'),
+    //require('./actions/universal-err-links.js'),
+
 ];
 
 module.exports = (course, stepCallback) => {
@@ -36,6 +38,9 @@ module.exports = (course, stepCallback) => {
                     eachCallback(err);
                     return;
                 }
+                item.techops.logs.forEach(log => {
+                    course.log(log.title, log.details);
+                });
                 eachCallback(null);
             });
         }

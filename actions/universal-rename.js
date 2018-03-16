@@ -28,11 +28,12 @@ module.exports = (course, item, callback) => {
     function action() {
         var oldTitle = item.techops.getTitle(item);
         item.techops.setTitle(item, found.newTitle);
-        course.log(`${item.techops.type} - Renamed`, {
+        item.techops.log(`${item.techops.type} - Renamed`, {
             'Old Title': oldTitle,
             'New Title': item.techops.getTitle(item),
             'ID': item.techops.getID(item)
         });
+        
         callback(null, course, item);
     }
 
