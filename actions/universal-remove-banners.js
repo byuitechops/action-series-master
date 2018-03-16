@@ -1,8 +1,6 @@
 const cheerio = require('cheerio');
 
 module.exports = (course, item, callback) => {
-    console.log(`universal-remove-banners called!`);
-
     //check to see if the item is set to be deleted. if it is,
     //we just need to move on. This also checks to see if the
     //page is an overview page. We are not to delete the banner
@@ -26,7 +24,7 @@ module.exports = (course, item, callback) => {
         var changeBool = false;
 
         if (images.length < 0) {
-            callback(null, course, item);
+            return;
         } else {
             images.each((index, image) => {
                 var alt = $(image).attr('alt');
@@ -34,14 +32,16 @@ module.exports = (course, item, callback) => {
                 if (alt.match(/course banner/gi)) {
                     $(image).remove();
 
-                    course.message(`Deleted banner.`);
-
                     changeBool = true;
                 }
             });
 
             if (changeBool) {
                 item.techops.setHTML(item, $.html());
+
+                course.log(`Banner Removal`, {
+                    'Title': item.techops.getTitle(item)
+                });
             }
 
             return;

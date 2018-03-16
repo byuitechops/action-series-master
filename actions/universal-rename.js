@@ -33,7 +33,7 @@ module.exports = (course, item, callback) => {
             'New Title': item.techops.getTitle(item),
             'ID': item.techops.getID(item)
         });
-        
+
         callback(null, course, item);
     }
 
