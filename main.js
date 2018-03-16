@@ -19,10 +19,19 @@ var templates = [
 var universal = [
     // require('./actions/universal-styling-div.js'),
     require('./actions/universal-rename.js'),
+<<<<<<< HEAD
     // require('./actions/universal-references.js'),
     // require('./actions/universal-target-attributes.js'),
     // require('./actions/universal-alt-attribute.js'),
     // require('./actions/universal-set-external-links.js'),
+=======
+    require('./actions/universal-references.js'),
+    require('./actions/universal-target-attributes.js'),
+    require('./actions/universal-alt-attribute.js'),
+    require('./actions/universal-set-external-links.js'),
+    require('./actions/universal-err-links.js'),
+    require('./actions/universal-remove-banners.js'),
+>>>>>>> a983d06d88985445ccbb1fcab4424fbb72eb2df6
 ];
 
 module.exports = (course, stepCallback) => {
@@ -36,6 +45,9 @@ module.exports = (course, stepCallback) => {
                     eachCallback(err);
                     return;
                 }
+                item.techops.logs.forEach(log => {
+                    course.log(log.title, log.details);
+                });
                 eachCallback(null);
             });
         }

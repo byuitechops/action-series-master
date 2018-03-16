@@ -13,31 +13,20 @@ module.exports = (course, item, callback) => {
 
     /* Potential matches in LOWER case */
     var urlsToChange = [{
-        url: /University\s*Polic/gi,
-        newUrl: 'https://content.byui.edu/integ/gen/d24f576f-d34b-47be-a466-d00bd4792fb6/0/universitypolicies.html'
-    }, {
-        url: /online\s*support\s*center/gi,
-        newUrl: 'https://content.byui.edu/integ/gen/8872d2b2-91d5-4953-a357-3097ef2aa5d0/0/?.vi=file&attachment.uuid=e509c91c-e500-4d6d-9a20-b8ff1b0186f9'
-    }, {
-        url: /library\s*research\s*guide/gi,
-        newUrl: 'https://content.byui.edu/integ/gen/8872d2b2-91d5-4953-a357-3097ef2aa5d0/0/?.vi=file&attachment.uuid=3b1239c4-a857-431b-b633-94d3fdbe396e'
-    }, {
-        url: /academic\s*support\s*center/gi,
-        newUrl: 'https://content.byui.edu/integ/gen/8872d2b2-91d5-4953-a357-3097ef2aa5d0/0/?.vi=file&attachment.uuid=91d9ec86-03ef-4c49-805f-65d488a1085c'
-    }, {
-        url: /copyright\s*(and|&)\s*source\s*/gi,
-        newUrl: 'https://docs.google.com/a/byui.edu/spreadsheets/d/156Y7L6XbeWHpNvK4h1oVpAOTAr141IonyKT_qLeSUZg/edit?usp=sharing'
-    }, {
-        url: /course\s*map|design\s*workbook/gi,
-        newUrl: course.info.designWorkbookURL
-    }];
+        /* This is an example for the gauntlet. Delete and replace with actual urls */
+        url: 'https://www.123test.com/iq-test/',
+        newUrl: 'https://www.google.com/',
+    },];
 
+    /* If there isn't any html in the item, call the callback */
+    if (!item.techops.getHTML(item)) {
+        callback(null, course, item);
+        return;
+    }
 
+    /* Get all of the links in the html */
     var $ = cheerio.load(item.techops.getHTML(item));
     var links = $('a').get();
-    console.log(`There are ${links.length} links in this item`);
-    console.log(`Those links are:` + links);
-    // var found = undefined;
 
     /* This is the action that happens if the test is passed */
     function action(link, newURL) {
@@ -45,16 +34,15 @@ module.exports = (course, item, callback) => {
         $(link).attr('href', newURL);
         $(link).attr('target', '_blank');
 
-        course.log(`${item.techops.type} - External Links in HTML Entities Set`, {
-            'Title': item.title,
-            'ID': item.id,
+        item.techops.log(`${item.techops.type} - External Links in HTML Entities Set`, {
+            'Title': item.techops.getTitle(item),
+            'ID': item.techops.getID(item),
             'Old URL': oldLink,
             'New URL': newURL,
         });
-
-        // callback(null, course, item);
     }
 
+    /* The if statement is the test to run action on each individual link */
     /* For each external link found, test to see if it matches one that needs to be changed from urlsToChange */
     links.forEach(link => {
         urlsToChange.forEach(externalURL => {
@@ -66,21 +54,7 @@ module.exports = (course, item, callback) => {
 
     /* Set the new html of the put item */
     item.techops.setHTML(item, $.html());
-    
+
     /* Call the callback after running through each link in the item */
     callback(null, course, item);
 };
-//         /* If the find function doesn't find anything, we know there isn't a match. */
-//         found = urlsToChange.find(currUrl => {
-//             currUrl.url.test($(link).attr('href'))
-//         });
-
-//         /* The test returns TRUE or FALSE - action() is called if true */
-//         if (found != undefined) {
-//             action(link);
-//         } else {
-//             callback(null, course, item);
-//         }
-//     });
-
-// };

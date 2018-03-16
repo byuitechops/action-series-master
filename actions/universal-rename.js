@@ -26,6 +26,7 @@ module.exports = (course, item, callback) => {
 
     /* This is the action that happens if the test is passed */
     function action() {
+<<<<<<< HEAD
         let oldTitle = item.techops.getTitle(item);
         let newTitle = found.newTitle;
         let itemID = item.techops.getID(item);
@@ -43,7 +44,16 @@ module.exports = (course, item, callback) => {
             'Current Title': oldTitle,
             'New Title': newTitle,
             'ID': itemID
+=======
+        var oldTitle = item.techops.getTitle(item);
+        item.techops.setTitle(item, found.newTitle);
+        item.techops.log(`${item.techops.type} - Renamed`, {
+            'Old Title': oldTitle,
+            'New Title': item.techops.getTitle(item),
+            'ID': item.techops.getID(item)
+>>>>>>> a983d06d88985445ccbb1fcab4424fbb72eb2df6
         });
+        
         callback(null, course, item);
     }
 
