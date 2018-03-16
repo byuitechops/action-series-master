@@ -1,60 +1,49 @@
 const main = require('./main.js');
 const createCourseObject = require('create-course-object');
-const reporter = require('conversion-reporter');
+const Logger = require('logger');
+const logger = new Logger;
+const canvas = require('canvas-wrapper');
 const Enquirer = require('enquirer');
 var enquirer = new Enquirer();
 
-function reportMe(reportFunction, course) {
+function getPristine() {
     return new Promise((resolve, reject) => {
-        reportFunction(course, (err, courseObj) => {
-            if (err) return reject(err);
-            else resolve(courseObj);
+        canvas.get('/api/v1/accounts/1/courses?search_term=1 (Pristine)', (getErr, foundCourse) => {
+            if (getErr) return reject(getErr);
+            if (foundCourse.length < 1) return reject(new Error('Cannot find Pristine Gauntlet.'));
+            resolve(foundCourse[0]);
         });
     });
 }
 
-enquirer.question('canvasID', 'Canvas Course ID:', { 'default': '7778' });
-enquirer.ask()
-    .then(answers => {
-        createCourseObject({}, (err, course) => {
-            course.info.checkStandards = true;
-            course.info.canvasOU = answers.canvasID;
-            main(course, (err, courseObject) => {
-                if (err) console.log(err);
-                else {
+function runActionSeries(foundCourse) {
+    return new Promise((resolve, reject) => {
+        /* Register the question with the found gauntlet as the default */
+        enquirer.question('canvasID', 'Canvas Course ID:', { 'default': foundCourse.id });
 
-                    reportMe(reporter.jsonReport, course)
-                        .then((courseObj) => {
-                            return reportMe(reporter.htmlReport, courseObj);
-                        })
-                        .then((courseObj) => {
-                            return reportMe(reporter.htmlReport, courseObj);
-                        })
-                        .catch(console.log);
+        /* Ask the user what course to run the action-series on */
+        enquirer.ask()
+            .then(answers => {
+                createCourseObject({}, (err, course) => {
+                    course.info.checkStandards = true;
+                    course.info.canvasOU = answers.canvasID;
 
-                    /* YOLO */
-                    // reporter.jsonReport(courseObj, (err1, courseObj2) => {
-                    //     if (err1) {
-                    //         console.log(err1);
-                    //         return;
-                    //     }
-                    //     reporter.consoleReport(courseObj2, (err2, courseObj3) => {
-                    //         if (err2) {
-                    //             console.log(err2);
-                    //             return;
-                    //         }
-                    //         reporter.htmlReport(courseObj3, (err3, courseObj4) => {
-                    //             if (err3) {
-                    //                 console.log(err3);
-                    //                 return;
-                    //             }
-                    //             console.log(`Course Standards Check for Canvas Course ID ${answers.canvasID} complete.`);
-                    //         });
-                    //     });
-                    // });
-                }
+                    /* Run the action-series model on the course */
+                    main(course, (err, courseObject) => {
+                        if (err) return reject(err);
+                        resolve(courseObject);
+                    });
+                });
             });
-        });
     });
+}
+
+getPristine()
+    .then(runActionSeries)
+    .then(courseObject => {
+        console.log('Success');
+    })
+    .catch(console.error);
+
 
 
