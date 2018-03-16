@@ -24,7 +24,7 @@ var universal = [
     require('./actions/universal-alt-attribute.js'),
     require('./actions/universal-set-external-links.js'),
     require('./actions/universal-err-links.js'),
-    require('./actions/universal-remove-banners.js'),
+    // require('./actions/universal-remove-banners.js'),
 ];
 
 module.exports = (course, stepCallback) => {
@@ -33,6 +33,10 @@ module.exports = (course, stepCallback) => {
 
         /* After tests/actions have run, PUT the object up to Canvas */
         function putTheItem(item, eachCallback) {
+            if (course.info.checkStandard === true) {
+                eachCallback(null);
+                return;
+            }
             template.putItem(course, item, (err) => {
                 if (err) {
                     eachCallback(err);
