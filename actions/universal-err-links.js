@@ -65,7 +65,7 @@ module.exports = (course, item, callback) => {
             link = $(link).attr('href').toLowerCase();
             foundERR = externalResources.find(externalResource => externalResource.test(link));
             if (foundERR != undefined) {
-                course.log('ERR Identified', {
+                item.techops.log('ERR Identified', {
                     'name': foundERR.toString().replace(/\//g, ''),
                     'url': link,
                     'item': item.techops.getTitle(item),
