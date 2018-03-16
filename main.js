@@ -6,13 +6,13 @@ const asyncLib = require('async');
 /* Templates */
 var templates = [
     require('action-series-pages'),
-    // require('action-series-module-items'),
-    // require('action-series-files'),
-    // require('action-series-modules'),
-    // require('action-series-assignments'),
-    // require('action-series-discussions'),
-    // require('action-series-quizzes'),
-    // require('action-series-quiz-questions'),
+    require('action-series-module-items'),
+    require('action-series-files'),
+    require('action-series-modules'),
+    require('action-series-assignments'),
+    require('action-series-discussions'),
+    require('action-series-quizzes'),
+    require('action-series-quiz-questions'),
 ];
 
 /* Universal item actions */
@@ -42,6 +42,7 @@ module.exports = (course, stepCallback) => {
                     eachCallback(err);
                     return;
                 }
+                console.log(item.techops.logs);
                 item.techops.logs.forEach(log => {
                     course.log(log.title, log.details);
                 });
@@ -59,7 +60,7 @@ module.exports = (course, stepCallback) => {
              * The first function is just to inject the needed values into the waterfall.
              * "universal" adds in the grandchildren that need to run on every category.
              * "template.actions" adds in the category's grandchildren. */
-            var actions = [asyncLib.constant(course, item), ...universal/*, ...template.actions*/];
+            var actions = [asyncLib.constant(course, item), ...universal, ...template.actions];
 
             asyncLib.waterfall(actions, (waterErr, course, finalItem) => {
                 if (waterErr) {
