@@ -38,9 +38,6 @@ module.exports = (course, stepCallback) => {
                     eachCallback(err);
                     return;
                 }
-                item.techops.logs.forEach(log => {
-                    course.log(log.title, log.details);
-                });
                 eachCallback(null);
             });
         }
