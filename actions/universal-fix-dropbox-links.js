@@ -1,12 +1,8 @@
 const asyncLib = require('async');
 const cheerio = require('cheerio');
+const canvas = require('canvas-wrapper');
 var xmlAssignments = [];
 var canvasAssignments = [];
-
-//returns a boolean value on the emptiness of the array
-Array.prototype.isEmpty = function () {
-    return this || this.length < 1
-}
 
 //perform a *destructive* deep copy from one array to another
 //working example: https://jsfiddle.net/jnpscauo/12/
@@ -28,7 +24,7 @@ module.exports = (course, item, callback) => {
     var itemDropboxLink = false;
 
     //no need to check items that will be deleted
-    if (item.techops.delete === true || item.techops.getHTML() === null) {
+    if (item.techops.delete === true || item.techops.getHTML(item) === null) {
         callback(null, course, item);
         return;
     } else {
@@ -69,11 +65,18 @@ module.exports = (course, item, callback) => {
      * entire grandchild module to run. 
     ******************************************************************/
     function checkArrays(buildXMLArrayCallback) {
-        if (xmlAssignments.isEmpty()) {
-            constructXMLAssigments();
+        console.log(`XML: ${xmlAssignments.length}`);
+
+        if (xmlAssignments.length < 1) {
+            constructXMLAssigments((err) => {
+                if (err) {
+                    buildXMLArrayCallback(err);
+                    return;
+                }
+            });
         }
 
-        if (canvasAssignments.isEmpty()) {
+        if (canvasAssignments.length < 1) {
             constructCanvasAssignments((err) => {
                 if (err) {
                     buildXMLArrayCallback(err);
@@ -130,12 +133,12 @@ module.exports = (course, item, callback) => {
         var itemPropertiesArray = [];
 
         //begin parsing the page through the getHTML properties
-        var $ = cheerio.load(item.getHTML());
+        var $ = cheerio.load(item.techops.getHTML(item));
         var links = $('a');
 
         //no links are found on the page. call the callback to exit out of grandchild
         if (links.length < 0) {
-            course.message(`${item.getTitle()}: no links found.`);
+            course.message(`${item.techops.getTitle(item)}: no links found.`);
             callback(null, course, item);
             //links are found. let's check each to see if they are dropbox links
         } else {
@@ -147,7 +150,7 @@ module.exports = (course, item, callback) => {
 
             //we have found one ore more dropbox links.
             if (itemDropboxLink) {
-                course.message(`${item.getTitle()}: identified dropbox links on page.`);
+                course.message(`${item.techops.getTitle(item)}: identified dropbox links on page.`);
 
                 asyncLib.each($(links), (link, eachCallback) => {
                     var url = $(link).attr('href');
@@ -182,8 +185,8 @@ module.exports = (course, item, callback) => {
                 //links are present in the page but none are dropbox links. 
                 //call the callback to exit out of grandchild.
             } else {
-                course.message(`${item.getTitle()}: links present but no dropbox links found.`);
-                callback(null, course, item);
+                course.message(`${item.techops.getTitle(item)}: links present but no dropbox links found.`);
+                return;
             }
 
             parseItemCallback(null, itemPropertiesArray);
@@ -193,8 +196,8 @@ module.exports = (course, item, callback) => {
     /****************************************************************
      * matchXMLAssignments
      * 
-     * @param - url string
-     * @param - srcId int
+     * @param url - string
+     * @param srcId - int
      * @param matchXMLAssignmentsCallback - callback
      * 
      * This function goes through all of the xmlAssignments and check to 
@@ -208,7 +211,7 @@ module.exports = (course, item, callback) => {
 
         asyncLib.each(xmlAssignments, (xmlAssignment, eachCallback) => {
             if (srcId === xmlAssignment.id) {
-                course.message(`${item.getTitle()}: found a match for dropbox link. About to proceed to fix link.`)
+                course.message(`${item.techops.getTitle(item)}: found a match for dropbox link. About to proceed to fix link.`)
 
                 var obj = {
                     'srcId': srcId,         //srcId to keep track of it
@@ -248,6 +251,8 @@ module.exports = (course, item, callback) => {
         asyncLib.each(itemProperties, (page, eachCallback) => {
             var newUrl = '';
 
+            console.log(`Page: ${JSON.stringify(page)}`);
+
             asyncLib.each(canvasAssignments, (canvasAssignment, innerEachCallback) => {
                 if (canvasAssignment.name === page.d2l.name) {
                     newUrl = assignment.html_url;
@@ -263,7 +268,7 @@ module.exports = (course, item, callback) => {
             });
 
             if (newUrl === '' || typeof newUrl !== "undefined") {
-                course.error(`${item.getTitle()}. Assignment not found. Please check the course then try again.`);
+                course.error(`${item.techops.getTitle(item)}. Assignment in Canvas not found. Please check the course then try again.`);
                 callback(null, course, item);
                 return;
             }
@@ -296,10 +301,10 @@ module.exports = (course, item, callback) => {
      * inside brokenLinks array.
     ******************************************************************/
     function repairLinks(brokenLinks, repairLinksCallback) {
-        var title = item.getTitle();
+        var title = item.techops.getTitle(item);
 
         asyncLib.each(brokenLinks, (brokenLink, eachCallback) => {
-            var $ = cheerio.load(item.getHTML());
+            var $ = cheerio.load(item.techops.getHTML(item));
             var links = $('a');
 
             //this fixes all of the occurrences of the same link 
@@ -346,7 +351,7 @@ module.exports = (course, item, callback) => {
      * function then parses the xml file and stores all of the 
      * information in an array.
     ******************************************************************/
-    function constructXMLAssigments() {
+    function constructXMLAssigments(constructXMLAssigmentsCallback) {
         //retrieve the dropbox_d2l.xml file
         var dropbox = getDropboxFile();
 
@@ -365,8 +370,8 @@ module.exports = (course, item, callback) => {
                 xmlAssignments.push(obj);
             });
         } else {
-            course.error(`${item.getTitle()}: dropbox_d2l.xml not found. Please check the course files and try again.`);
-            callback(null, course, item);
+            // course.error(`${item.techops.getTitle(item)}: dropbox_d2l.xml not found. Please check the course files and try again.`);
+            constructXMLAssigmentsCallback(new Error(`dropbox_d2l.xml not found`));
         }
     }
 }
