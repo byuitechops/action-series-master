@@ -2,7 +2,20 @@ const cheerio = require('cheerio');
 
 module.exports = (course, item, callback) => {
 
-    function action() {
+    //check to see if the item is set to be deleted. if it is,
+    //we just need to move on. This also checks to see if the
+    //page is an overview page. We are not to delete the banner
+    //from overview pages.
+    if (item.techops.delete === true ||
+        item.techops.getTitle(item).match(/overview/gi)) {
+            callback(null, course, item);
+            return;
+    } else {
+        processItem();
+        callback(null, course, item);
+    }
+
+    function processItem() {
         var $ = cheerio.load(item.techops.getHTML(item));
         var images = $('img');
 
@@ -17,10 +30,11 @@ module.exports = (course, item, callback) => {
             images.each((index, image) => {
                 var alt = $(image).attr('alt');
 
-                if (alt.match(/banner/gi)) {
-                    //"If you set an attribute's value to null, you remove that attribute." --Cheerio documentation
-                    $(image) = null;
-                    
+                if (alt.match(/course banner/gi)) {
+                    $(image).remove();
+
+                    course.message(`Deleted banner.`);
+
                     changeBool = true;
                 }
             });
@@ -32,16 +46,4 @@ module.exports = (course, item, callback) => {
             callback(null, course, item);
         }
     }
-    
-    //check to see if the item is set to be deleted. if it is,
-    //we just need to move on. This also checks to see if the
-    //page is an overview page. We are not to delete the banner
-    //from overview pages.
-    if (item.techops.delete ||
-        item.techops.getTitle(item).match(/overview/gi)) {
-        callback(null, course, item);
-        return;
-    } 
-    
-    action();
 }
