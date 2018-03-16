@@ -62,7 +62,7 @@ getPristine()
     .then(courseObject => {
         console.log(`${courseObject.info.courseName} completely checked.`);
     })
-    .catch(console.error);
+    .catch(logger.error);
 
 
 

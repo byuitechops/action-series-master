@@ -31,10 +31,17 @@ module.exports = (course, stepCallback) => {
 
     function runSeries(template, seriesCallback) {
 
+        function confirmLogs(item) {
+            item.techops.logs.forEach(log => {
+                course.log(log.title, log.details);
+            });
+        }
+
         /* After tests/actions have run, PUT the object up to Canvas */
         function putTheItem(item, eachCallback) {
             if (course.info.checkStandards === true) {
                 eachCallback(null);
+                confirmLogs(item);
                 return;
             }
             template.putItem(course, item, (err) => {
@@ -42,10 +49,7 @@ module.exports = (course, stepCallback) => {
                     eachCallback(err);
                     return;
                 }
-                console.log(item.techops.logs);
-                item.techops.logs.forEach(log => {
-                    course.log(log.title, log.details);
-                });
+                confirmLogs(item);
                 eachCallback(null);
             });
         }
