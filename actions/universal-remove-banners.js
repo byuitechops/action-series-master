@@ -1,6 +1,7 @@
 const cheerio = require('cheerio');
 
 module.exports = (course, item, callback) => {
+    console.log(`universal-remove-banners called!`);
 
     //check to see if the item is set to be deleted. if it is,
     //we just need to move on. This also checks to see if the
@@ -43,7 +44,7 @@ module.exports = (course, item, callback) => {
                 item.techops.setHTML(item, $.html());
             }
 
-            callback(null, course, item);
+            return;
         }
     }
 }
