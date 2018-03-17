@@ -29,10 +29,12 @@ module.exports = (course, item, callback) => {
             images.each((index, image) => {
                 var alt = $(image).attr('alt');
 
-                if (alt.match(/course banner/gi)) {
-                    $(image).remove();
-
-                    changeBool = true;
+                if (alt != '' || typeof alt != "undefined") {
+                    if (alt.match(/course banner/gi)) {
+                        $(image).remove();
+    
+                        changeBool = true;
+                    }
                 }
             });
 
