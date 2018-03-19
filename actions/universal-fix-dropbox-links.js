@@ -1,6 +1,7 @@
 const asyncLib = require('async');
 const cheerio = require('cheerio');
 const canvas = require('canvas-wrapper');
+
 var xmlAssignments = [];
 var canvasAssignments = [];
 
@@ -12,10 +13,6 @@ Array.prototype.clone = function (arr) {
     //https://jsperf.com/new-array-vs-splice-vs-slice/19
     if (arr instanceof Array) {
         return this.push(arr.splice(0));
-    } else if (typeof arr === "undefined") {
-        throw "ERROR: the array you are trying to clone is undefined.";
-    } else {
-        throw "ERROR: ${arr} is not an array.";
     }
 }
 
@@ -28,7 +25,15 @@ module.exports = (course, item, callback) => {
         callback(null, course, item);
         return;
     } else {
-        beginProcess();
+        beginProcess((err) => {
+            if (err) {
+                course.error(err);
+                callback(null, course, item);
+                return;
+            }
+
+            callback(null, course, item);
+        });
     }
 
     /****************************************************************
@@ -37,7 +42,7 @@ module.exports = (course, item, callback) => {
      * This function acts as a driver for the program. It waterfalls 
      * all of the functions.
     ******************************************************************/
-    function beginProcess() {
+    function beginProcess(beginProcessCallback) {
         var functions = [
             checkArrays,
             parseItem,
@@ -47,37 +52,53 @@ module.exports = (course, item, callback) => {
 
         asyncLib.waterfall(functions, (waterfallErr) => {
             if (waterfallErr) {
-                course.error(waterfallErr);
+                beginProcessCallback(waterfallErr);
+                return;
             }
 
-            callback(null, course, item);
+            beginProcessCallback(null);
         });
     }
 
     /****************************************************************
      * checkArrays
      * 
-     * @param buildXMLArrayCallback - callback
+     * @param checkArraysCallback - callback
      * 
      * This function needs to happen before everything. This goes through
      * and ensure that everything has been set up correctly so the program
      * doesn't have to parse the XML or make API calls 9000 times for the 
      * entire grandchild module to run. 
     ******************************************************************/
-    function checkArrays(buildXMLArrayCallback) {
-        console.log(`XML: ${xmlAssignments.length}`);
+    function checkArrays(checkArraysCallback) {
+        var functions = [
+            buildXMLArray,
+            buildCanvasArray
+        ];
 
+         
+        asyncLib.waterfall(functions, (waterfallErr) => {
+            if (waterfallErr) {
+                checkArraysCallback(waterfallErr);
+                return;
+            }
+
+            checkArraysCallback(null);
+        });
+    }
+
+    /****************************************************************
+     * buildXMLArray
+     * 
+     * @param buildXMLArrayCallback - callback
+     * 
+     * This function needs to happen before everything. This goes through
+     * and ensure that the XML array has been set up correctly so the program
+     * doesn't have to parse the XML 9000 times.
+    ******************************************************************/
+    function buildXMLArray(buildXMLArrayCallback) {
         if (xmlAssignments.length < 1) {
-            constructXMLAssigments((err) => {
-                if (err) {
-                    buildXMLArrayCallback(err);
-                    return;
-                }
-            });
-        }
-
-        if (canvasAssignments.length < 1) {
-            constructCanvasAssignments((err) => {
+            constructXMLAssignments((err) => {
                 if (err) {
                     buildXMLArrayCallback(err);
                     return;
@@ -87,6 +108,32 @@ module.exports = (course, item, callback) => {
             });
         } else {
             buildXMLArrayCallback(null);
+        }
+    }
+
+    /****************************************************************
+     * buildCanvasArrayCallback
+     * 
+     * @param buildCanvasArrayCallback - callback
+     * 
+     * This function needs to happen before everything. This goes through
+     * and ensure that the canvas array has been set up correctly so the 
+     * program doesn't have to make API calls 9000 times.
+    ******************************************************************/
+    function buildCanvasArray(buildCanvasArrayCallback) {
+        console.log(`Canvas assignment: ${canvasAssignments.length}`);
+        if (canvasAssignments.length < 1) {
+            constructCanvasAssignments((err) => {
+                if (err) {
+                    buildXMLArrayCallback(err);
+                    return;
+                }
+
+                canvasAssignments = canvasAssignments[0];
+                buildCanvasArrayCallback(null);
+            });
+        } else {
+            buildCanvasArrayCallback(null);
         }
     }
 
@@ -107,14 +154,10 @@ module.exports = (course, item, callback) => {
                 return;
             }
 
-            try {
-                //move the contents from the assignments to canvasAssignments array
-                canvasAssignments.clone(assignments);
-            } catch (e) {
-                course.error(e);
-            }
+            //move the contents from the assignments to canvasAssignments array
+            canvasAssignments.clone(assignments);
 
-            course.message(`Successfully retrieved all assignmnets from canvas and is now stored on canvasAssignments.`);
+            course.message(`Successfully retrieved all assignments from Canvas and is now stored on canvasAssignments.`);
             constructCanvasAssignmentsCallback(null);
         });
     }
@@ -136,10 +179,10 @@ module.exports = (course, item, callback) => {
         var $ = cheerio.load(item.techops.getHTML(item));
         var links = $('a');
 
-        //no links are found on the page. call the callback to exit out of grandchild
+        //no links are found on the page so return!
         if (links.length < 0) {
-            course.message(`${item.techops.getTitle(item)}: no links found.`);
-            callback(null, course, item);
+            course.message(`${item.techops.getTitle(item)} page: no links found.`);
+            return;
             //links are found. let's check each to see if they are dropbox links
         } else {
             $(links).each((index, link) => {
@@ -150,7 +193,7 @@ module.exports = (course, item, callback) => {
 
             //we have found one ore more dropbox links.
             if (itemDropboxLink) {
-                course.message(`${item.techops.getTitle(item)}: identified dropbox links on page.`);
+                course.message(`${item.techops.getTitle(item)} page: identified dropbox links on page.`);
 
                 asyncLib.each($(links), (link, eachCallback) => {
                     var url = $(link).attr('href');
@@ -167,11 +210,7 @@ module.exports = (course, item, callback) => {
                                 return;
                             }
 
-                            try {
-                                itemPropertiesArray.clone(itemProperties);
-                            } catch (e) {
-                                course.error(e);
-                            }
+                            itemPropertiesArray.clone(itemProperties);
                         });
                     }
 
@@ -185,7 +224,7 @@ module.exports = (course, item, callback) => {
                 //links are present in the page but none are dropbox links. 
                 //call the callback to exit out of grandchild.
             } else {
-                course.message(`${item.techops.getTitle(item)}: links present but no dropbox links found.`);
+                course.message(`${item.techops.getTitle(item)} page: links present but no dropbox links found.`);
                 return;
             }
 
@@ -211,7 +250,7 @@ module.exports = (course, item, callback) => {
 
         asyncLib.each(xmlAssignments, (xmlAssignment, eachCallback) => {
             if (srcId === xmlAssignment.id) {
-                course.message(`${item.techops.getTitle(item)}: found a match for dropbox link. About to proceed to fix link.`)
+                course.message(`${item.techops.getTitle(item)} page: found a match for dropbox link. About to proceed to fix link.`)
 
                 var obj = {
                     'srcId': srcId,         //srcId to keep track of it
@@ -254,7 +293,7 @@ module.exports = (course, item, callback) => {
             console.log(`Page: ${JSON.stringify(page)}`);
 
             asyncLib.each(canvasAssignments, (canvasAssignment, innerEachCallback) => {
-                if (canvasAssignment.name === page.d2l.name) {
+                if (canvasAssignment.name === page[0].d2l.name) {
                     newUrl = assignment.html_url;
                     innerEachCallback(null);
                 } else {
@@ -268,8 +307,7 @@ module.exports = (course, item, callback) => {
             });
 
             if (newUrl === '' || typeof newUrl !== "undefined") {
-                course.error(`${item.techops.getTitle(item)}. Assignment in Canvas not found. Please check the course then try again.`);
-                callback(null, course, item);
+                eachCallback(new Error(`${item.techops.getTitle(item)}. Assignment in Canvas not found. Please check the course then try again.`));
                 return;
             }
 
@@ -330,20 +368,6 @@ module.exports = (course, item, callback) => {
     }
 
     /****************************************************************
-     * getDropboxFile
-     * 
-     * This function retrieves the dropbox_d2l.xml from the 
-     * course.content so it can be parsed.
-    ******************************************************************/
-    function getDropboxFile() {
-        var file = course.content.find((file) => {
-            return file.name === `dropbox_d2l.xml`;
-        });
-
-        return file;
-    }
-
-    /****************************************************************
      * constructXMLAssigments
      * 
      * This function retrieves the dropbox_d2l.xml which holds all of
@@ -351,9 +375,11 @@ module.exports = (course, item, callback) => {
      * function then parses the xml file and stores all of the 
      * information in an array.
     ******************************************************************/
-    function constructXMLAssigments(constructXMLAssigmentsCallback) {
+    function constructXMLAssignments(constructXMLAssigmentsCallback) {
         //retrieve the dropbox_d2l.xml file
-        var dropbox = getDropboxFile();
+        var dropbox = course.content.find((file) => {
+            return file.name === `dropbox_d2l.xml`;
+        });
 
         //checking to see if the dropbox xml really has been found
         if (typeof dropbox != "undefined") {
