@@ -40,8 +40,8 @@ module.exports = (course, stepCallback) => {
         /* After tests/actions have run, PUT the object up to Canvas */
         function putTheItem(item, eachCallback) {
             if (course.info.checkStandards === true) {
-                eachCallback(null);
                 confirmLogs(item);
+                eachCallback(null);
                 return;
             }
             template.putItem(course, item, (err) => {
