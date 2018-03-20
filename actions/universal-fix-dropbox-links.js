@@ -5,17 +5,6 @@ const canvas = require('canvas-wrapper');
 var xmlAssignments = [];
 var canvasAssignments = [];
 
-//perform a *destructive* deep copy from one array to another
-//working example: https://jsfiddle.net/jnpscauo/12/
-Array.prototype.clone = function (arr) {
-    //benchmarks prove that .splice with zero index is the
-    //most efficient way to perform a copy
-    //https://jsperf.com/new-array-vs-splice-vs-slice/19
-    if (arr instanceof Array) {
-        return this.push(arr.splice(0));
-    }
-}
-
 module.exports = (course, item, callback) => {
 
     var itemDropboxLink = false;
@@ -121,7 +110,6 @@ module.exports = (course, item, callback) => {
      * program doesn't have to make API calls 9000 times.
     ******************************************************************/
     function buildCanvasArray(buildCanvasArrayCallback) {
-        console.log(`Canvas assignment: ${canvasAssignments.length}`);
         if (canvasAssignments.length < 1) {
             constructCanvasAssignments((err) => {
                 if (err) {
@@ -129,7 +117,6 @@ module.exports = (course, item, callback) => {
                     return;
                 }
 
-                canvasAssignments = canvasAssignments[0];
                 buildCanvasArrayCallback(null);
             });
         } else {
@@ -148,16 +135,19 @@ module.exports = (course, item, callback) => {
      * for API calls down to 1 for this entire grandchild.
     ******************************************************************/
     function constructCanvasAssignments(constructCanvasAssignmentsCallback) {
+        var assignmentsHolder = [];
+
         canvas.get(`/api/v1/courses/${course.info.canvasOU}/assignments`, (getErr, assignments) => {
             if (getErr) {
                 constructCanvasAssignmentsCallback(err);
                 return;
             }
+            
+            // //move the contents from the assignments to canvasAssignments array
+            // assignmentsHolder.clone(assignments);
+            // canvasAssignments = assignmentsHolder[0];
+            canvasAssignments = [...assignments];
 
-            //move the contents from the assignments to canvasAssignments array
-            canvasAssignments.clone(assignments);
-
-            course.message(`Successfully retrieved all assignments from Canvas and is now stored on canvasAssignments.`);
             constructCanvasAssignmentsCallback(null);
         });
     }
@@ -210,7 +200,7 @@ module.exports = (course, item, callback) => {
                                 return;
                             }
 
-                            itemPropertiesArray.clone(itemProperties);
+                            itemPropertiesArray.push(...itemProperties);
                         });
                     }
 
@@ -220,15 +210,16 @@ module.exports = (course, item, callback) => {
                         parseItemCallback(eachErr);
                         return;
                     }
+
+                    parseItemCallback(null);
                 });
+
+                parseItemCallback(null, itemPropertiesArray);
                 //links are present in the page but none are dropbox links. 
                 //call the callback to exit out of grandchild.
             } else {
                 course.message(`${item.techops.getTitle(item)} page: links present but no dropbox links found.`);
-                return;
             }
-
-            parseItemCallback(null, itemPropertiesArray);
         }
     }
 
@@ -293,8 +284,8 @@ module.exports = (course, item, callback) => {
             console.log(`Page: ${JSON.stringify(page)}`);
 
             asyncLib.each(canvasAssignments, (canvasAssignment, innerEachCallback) => {
-                if (canvasAssignment.name === page[0].d2l.name) {
-                    newUrl = assignment.html_url;
+                if (canvasAssignment.name === page.d2l.name) {
+                    newUrl = canvasAssignment.html_url;
                     innerEachCallback(null);
                 } else {
                     innerEachCallback(null);
@@ -304,9 +295,12 @@ module.exports = (course, item, callback) => {
                     eachCallback(innerEachErr);
                     return;
                 }
+
+                eachCallback(null);
             });
 
-            if (newUrl === '' || typeof newUrl !== "undefined") {
+            console.log(`newURL: ${newUrl}`);
+            if (newUrl === '' || typeof newUrl === "undefined") {
                 eachCallback(new Error(`${item.techops.getTitle(item)}. Assignment in Canvas not found. Please check the course then try again.`));
                 return;
             }
@@ -341,30 +335,27 @@ module.exports = (course, item, callback) => {
     function repairLinks(brokenLinks, repairLinksCallback) {
         var title = item.techops.getTitle(item);
 
-        asyncLib.each(brokenLinks, (brokenLink, eachCallback) => {
-            var $ = cheerio.load(item.techops.getHTML(item));
-            var links = $('a');
+        var $ = cheerio.load(item.techops.getHTML(item));
+        var links = $('a');
 
-            //this fixes all of the occurrences of the same link 
-            brokenLink.forEach((item) => {
-                links.attr('href', (index, link) => {
-                    return link.replace(item.badLink, item.newLink);
-                });
+        console.log(`brokenLinks: ${JSON.stringify(brokenLinks)}`);        
 
-                item.techops.log('Fixed Broken Dropbox Quicklinks', {
-                    'badLink': item.badLink,
-                    'newLink': item.newLink,
-                    'page': title,
-                });
+        //this fixes all of the occurrences of the same link 
+        brokenLinks.forEach((item) => {
+            links.attr('href', (index, link) => {
+                return link.replace(item.badLink, item.newLink);
             });
-        }, (eachErr) => {
-            if (eachErr) {
-                repairLinksCallback(eachErr);
-                return;
-            }
 
-            repairLinksCallback(null);
+            course.log('Fixed Broken Dropbox Quicklinks', {
+                'badLink': item.badLink,
+                'newLink': item.newLink,
+                'page': title,
+            });
         });
+
+        item.techops.setHTML(item, $.html());
+
+        repairLinksCallback(null);
     }
 
     /****************************************************************
@@ -395,6 +386,7 @@ module.exports = (course, item, callback) => {
 
                 xmlAssignments.push(obj);
             });
+            constructXMLAssigmentsCallback(null);
         } else {
             // course.error(`${item.techops.getTitle(item)}: dropbox_d2l.xml not found. Please check the course files and try again.`);
             constructXMLAssigmentsCallback(new Error(`dropbox_d2l.xml not found`));
