@@ -13,9 +13,9 @@ module.exports = (course, item, callback) => {
     if (item.techops.delete === true || item.techops.getHTML(item) === null) {
         callback(null, course, item);
         return;
-    } else {
-        beginProcess();
     }
+     
+    beginProcess();
 
     /****************************************************************
      * beginProcess
@@ -24,6 +24,9 @@ module.exports = (course, item, callback) => {
      * all of the functions.
     ******************************************************************/
     function beginProcess(beginProcessCallback) {
+        //ensure that the arrays are correctly populated before
+        //starting the repairLinks grandchild.
+        //checkArrays is done in async.
         checkArrays((err) => {
             if (err) {
                 course.error(err);
@@ -52,7 +55,8 @@ module.exports = (course, item, callback) => {
             buildCanvasArray
         ];
 
-         
+        //waterfall through the functions to help ensure that the 
+        //arrays are actually completed.     
         asyncLib.waterfall(functions, (waterfallErr) => {
             if (waterfallErr) {
                 checkArraysCallback(waterfallErr);
@@ -169,11 +173,14 @@ module.exports = (course, item, callback) => {
                     if (url.includes('drop_box_')) {
                         var srcId = url.split('drop_box_').pop();
 
+                        //retrieve correct XML object to retrieve link
                         var itemProperties = matchXMLAssignments(url, srcId);
                         itemPropertiesArray.push(...itemProperties);
                     }
 
                 });
+
+                //pass array in to get correct Canvas dropbox
                 getCorrectLinks(itemPropertiesArray);
             }
         }
@@ -199,6 +206,7 @@ module.exports = (course, item, callback) => {
         xmlAssignments.forEach((xmlAssignment, index) => {
             if (srcId === xmlAssignment.id) {
 
+                //build object to make life easier
                 itemProperties.push({
                     'srcId': srcId,
                     'd2l': xmlAssignment,
@@ -207,6 +215,7 @@ module.exports = (course, item, callback) => {
             }
         });
 
+        //return the array to be utilized to find the correct Canvas dropbox
         return itemProperties;
     }
 
@@ -219,10 +228,12 @@ module.exports = (course, item, callback) => {
      * correct url for the dropbox.
     ******************************************************************/
     function getCanvasUrl(link) {
+        //find the Canvas assignment that we are looking for.
         var item = canvasAssignments.find((canvasAssignment) => {
             return canvasAssignment.name === link.d2l.name;
         });
 
+        //we only need html_url so this does it for us
         return item.html_url;
     }
 
@@ -238,12 +249,16 @@ module.exports = (course, item, callback) => {
         var brokenLinks = [];
 
         itemPropertiesArray.forEach((link, index) => {
+            //retrieve correct Dropbox link
             var newUrl = getCanvasUrl(link);
 
+            //the Canvas Dropbox does not exist in the course
             if (newUrl === '' || typeof newUrl === "undefined") {
+                course.error(`You may want to investigate this course a little bit more since a dropbox is missing.`);
                 return;
             } 
 
+            //build object and add to array to help repairLinks have an easier time
             brokenLinks.push({
                 'badLink': link.url,
                 'newLink': newUrl
@@ -252,7 +267,7 @@ module.exports = (course, item, callback) => {
         });
 
         repairLinks(brokenLinks);
-        return ;
+        return;
     }
 
     /****************************************************************
@@ -278,6 +293,7 @@ module.exports = (course, item, callback) => {
                 return link.replace(item.badLink, item.newLink);
             });
 
+            //log to make life easier for everyone
             course.log(logName, {
                 'badLink': item.badLink,
                 'newLink': item.newLink,
@@ -318,6 +334,7 @@ module.exports = (course, item, callback) => {
 
                 xmlAssignments.push(obj);
             });
+
             constructXMLAssigmentsCallback(null);
         } else {
             constructXMLAssigmentsCallback(new Error(`dropbox_d2l.xml not found`));
