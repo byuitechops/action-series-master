@@ -7,8 +7,8 @@ module.exports = (course, item, callback) => {
     //from overview pages.
     if (item.techops.delete === true ||
         item.techops.getTitle(item).match(/overview/gi)) {
-            callback(null, course, item);
-            return;
+        callback(null, course, item);
+        return;
     } else {
         processItem();
         callback(null, course, item);
@@ -29,10 +29,10 @@ module.exports = (course, item, callback) => {
             images.each((index, image) => {
                 var alt = $(image).attr('alt');
 
-                if (alt != '' || typeof alt != "undefined") {
+                if (alt != '' || typeof alt != 'undefined') {
                     if (alt.match(/course banner/gi)) {
                         $(image).remove();
-    
+
                         changeBool = true;
                     }
                 }
@@ -41,7 +41,7 @@ module.exports = (course, item, callback) => {
             if (changeBool) {
                 item.techops.setHTML(item, $.html());
 
-                course.log(`Banner Removal`, {
+                course.log('Banner Removal', {
                     'Title': item.techops.getTitle(item)
                 });
             }
@@ -49,4 +49,4 @@ module.exports = (course, item, callback) => {
             return;
         }
     }
-}
+};

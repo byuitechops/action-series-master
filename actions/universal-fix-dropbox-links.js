@@ -14,7 +14,7 @@ Array.prototype.clone = function (arr) {
     if (arr instanceof Array) {
         return this.push(arr.splice(0));
     }
-}
+};
 
 module.exports = (course, item, callback) => {
 
@@ -121,7 +121,7 @@ module.exports = (course, item, callback) => {
      * program doesn't have to make API calls 9000 times.
     ******************************************************************/
     function buildCanvasArray(buildCanvasArrayCallback) {
-        console.log(`Canvas assignment: ${canvasAssignments.length}`);
+        // console.log(`Canvas assignment: ${canvasAssignments.length}`);
         if (canvasAssignments.length < 1) {
             constructCanvasAssignments((err) => {
                 if (err) {
@@ -150,14 +150,14 @@ module.exports = (course, item, callback) => {
     function constructCanvasAssignments(constructCanvasAssignmentsCallback) {
         canvas.get(`/api/v1/courses/${course.info.canvasOU}/assignments`, (getErr, assignments) => {
             if (getErr) {
-                constructCanvasAssignmentsCallback(err);
+                constructCanvasAssignmentsCallback(getErr);
                 return;
             }
 
             //move the contents from the assignments to canvasAssignments array
             canvasAssignments.clone(assignments);
 
-            course.message(`Successfully retrieved all assignments from Canvas and is now stored on canvasAssignments.`);
+            course.message('Successfully retrieved all assignments from Canvas and is now stored on canvasAssignments.');
             constructCanvasAssignmentsCallback(null);
         });
     }
@@ -250,7 +250,7 @@ module.exports = (course, item, callback) => {
 
         asyncLib.each(xmlAssignments, (xmlAssignment, eachCallback) => {
             if (srcId === xmlAssignment.id) {
-                course.message(`${item.techops.getTitle(item)} page: found a match for dropbox link. About to proceed to fix link.`)
+                course.message(`${item.techops.getTitle(item)} page: found a match for dropbox link. About to proceed to fix link.`);
 
                 var obj = {
                     'srcId': srcId,         //srcId to keep track of it
@@ -290,7 +290,7 @@ module.exports = (course, item, callback) => {
         asyncLib.each(itemProperties, (page, eachCallback) => {
             var newUrl = '';
 
-            console.log(`Page: ${JSON.stringify(page)}`);
+            // console.log(`Page: ${JSON.stringify(page)}`);
 
             asyncLib.each(canvasAssignments, (canvasAssignment, innerEachCallback) => {
                 if (canvasAssignment.name === page[0].d2l.name) {
@@ -306,7 +306,7 @@ module.exports = (course, item, callback) => {
                 }
             });
 
-            if (newUrl === '' || typeof newUrl !== "undefined") {
+            if (newUrl === '' || typeof newUrl !== 'undefined') {
                 eachCallback(new Error(`${item.techops.getTitle(item)}. Assignment in Canvas not found. Please check the course then try again.`));
                 return;
             }
@@ -378,11 +378,11 @@ module.exports = (course, item, callback) => {
     function constructXMLAssignments(constructXMLAssigmentsCallback) {
         //retrieve the dropbox_d2l.xml file
         var dropbox = course.content.find((file) => {
-            return file.name === `dropbox_d2l.xml`;
+            return file.name === 'dropbox_d2l.xml';
         });
 
         //checking to see if the dropbox xml really has been found
-        if (typeof dropbox != "undefined") {
+        if (typeof dropbox != 'undefined') {
             var $ = dropbox.dom;
 
             //iterate through the xml nodes and retrieve the id and name 
@@ -397,7 +397,7 @@ module.exports = (course, item, callback) => {
             });
         } else {
             // course.error(`${item.techops.getTitle(item)}: dropbox_d2l.xml not found. Please check the course files and try again.`);
-            constructXMLAssigmentsCallback(new Error(`dropbox_d2l.xml not found`));
+            constructXMLAssigmentsCallback(new Error('dropbox_d2l.xml not found'));
         }
     }
-}
+};
