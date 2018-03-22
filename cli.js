@@ -6,6 +6,15 @@ const canvas = require('canvas-wrapper');
 const Enquirer = require('enquirer');
 var enquirer = new Enquirer();
 
+function buildHeader(course) {
+    return `
+        <h2>Course Standards Report</h2>
+        <p>Here are all of the course standards that are currently not being met within the course.</p>
+        <p>Course ID: ${course.info.canvasOU}</p>
+        <a target="_blank" href="https://byui.instructure.com/courses/${course.info.canvasOU}">https://byui.instructure.com/courses/${course.info.canvasOU}</a>
+    `;
+}
+
 function getPristine() {
     return new Promise((resolve, reject) => {
         canvas.get('/api/v1/accounts/1/courses?search_term=1 (Pristine)', (getErr, foundCourse) => {
@@ -20,7 +29,7 @@ function getUserCourse(courseID) {
     return new Promise((resolve, reject) => {
         canvas.get(`/api/v1/accounts/1/courses/${courseID}`, (err, givenCourse) => {
             if (err) return reject(err);
-            resolve(givenCourse);
+            resolve(givenCourse[0]);
         });
     });
 }
@@ -33,6 +42,8 @@ function runActionSeries(foundCourse) {
             course.info.courseName = foundCourse.name;
             course.info.checkStandards = true;
             course.info.canvasOU = foundCourse.id;
+            course.info.usedFiles = [];
+            course.info.unusedFiles = [];
 
             /* Run the action-series model on the course */
             main(course, (err, courseObject) => {
@@ -56,13 +67,20 @@ async function promptUser(foundCourse) {
     return runActionSeries(foundCourse);
 }
 
-
 getPristine()
     .then(promptUser)
     .then(courseObject => {
         console.log(`${courseObject.info.courseName} completely checked.`);
+        // Set the Report Header
+        courseObject.setReportHeader(buildHeader(courseObject));
+        // Generate the Console Report
+        courseObject.consoleReport();
+        // Generate the JSON Report
+        courseObject.jsonReport(`./reports/${courseObject.info.fileName.split('.zip')[0]} Conversion Report.json`);
+        // Generate the HTML Report
+        courseObject.htmlReport('./reports', courseObject.info.courseName);
     })
-    .catch(logger.error);
+    .catch(console.log);
 
 
 

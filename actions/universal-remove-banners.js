@@ -6,6 +6,7 @@ module.exports = (course, item, callback) => {
     //page is an overview page. We are not to delete the banner
     //from overview pages.
     if (item.techops.delete === true ||
+        item.techops.getHTML(item) === null ||
         item.techops.getTitle(item).match(/overview/gi)) {
         callback(null, course, item);
         return;
@@ -29,10 +30,9 @@ module.exports = (course, item, callback) => {
             images.each((index, image) => {
                 var alt = $(image).attr('alt');
 
-                if (alt != '' || typeof alt != 'undefined') {
+                if (alt !== '' && typeof alt !== 'undefined') {
                     if (alt.match(/course banner/gi)) {
                         $(image).remove();
-
                         changeBool = true;
                     }
                 }
