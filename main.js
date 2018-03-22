@@ -107,7 +107,7 @@ module.exports = (course, stepCallback) => {
 
     asyncLib.eachSeries(templates, runSeries, (err) => {
         if (err) {
-            console.log(err);
+            course.error(err);
             stepCallback(err, course);
         } else {
             stepCallback(null, course);

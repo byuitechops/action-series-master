@@ -49,4 +49,4 @@ module.exports = (course, item, callback) => {
             return;
         }
     }
-}
+};
