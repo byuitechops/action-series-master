@@ -33,7 +33,6 @@ module.exports = (course, item, callback) => {
                 if (alt !== '' && typeof alt !== 'undefined') {
                     if (alt.match(/course banner/gi)) {
                         $(image).remove();
-
                         changeBool = true;
                     }
                 }

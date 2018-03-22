@@ -32,7 +32,7 @@ None
 
 ## Process
 
-This module takes in a series of "templtes" (action-series-pages, action-series-discussions, action-series-quizzes, etc.) and runs an asynchronous forEach on them. Each template provides methods and data used to complete the action-series model. Since retrieving quizzes and updating quizzes is a different format than retrieving pages and updating pages in Canvas, it has been left to the template to provide the methods to do so. action-series-master just contains the action-series pattern and enacts it using each template.
+This module takes in a series of "templates" (action-series-pages, action-series-discussions, action-series-quizzes, etc.) and runs an asynchronous forEach on them. Each template provides methods and data used to complete the action-series model. Since retrieving quizzes and updating quizzes is a different format than retrieving pages and updating pages in Canvas, it has been left to the template to provide the methods to do so. action-series-master just contains the action-series pattern and enacts it using each template.
 
 ## Log Categories
 
