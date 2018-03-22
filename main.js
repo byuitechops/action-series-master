@@ -6,26 +6,26 @@ const asyncLib = require('async');
 /* Templates */
 var templates = [
     require('action-series-pages'),
-    // require('action-series-module-items'),
-    // require('action-series-files'),
-    // require('action-series-modules'),
-    // require('action-series-assignments'),
-    // require('action-series-discussions'),
-    // require('action-series-quizzes'),
-    // require('action-series-quiz-questions'),
+    require('action-series-module-items'),
+    require('action-series-files'),
+    require('action-series-modules'),
+    require('action-series-assignments'),
+    require('action-series-discussions'),
+    require('action-series-quizzes'),
+    require('action-series-quiz-questions'),
 ];
 
 /* Universal item actions */
 var universal = [
-    // require('./actions/universal-styling-div.js'),
-    // require('./actions/universal-rename.js'),
-    // require('./actions/universal-references.js'),
-    // require('./actions/universal-target-attributes.js'),
-    // require('./actions/universal-alt-attribute.js'),
-    // require('./actions/universal-set-external-links.js'),
-    // require('./actions/universal-err-links.js'),
-    // require('./actions/universal-remove-banners.js'),
-    require('./actions/universal-fix-dropbox-links.js'),
+    require('./actions/universal-styling-div.js'),
+    require('./actions/universal-rename.js'),
+    require('./actions/universal-references.js'),
+    require('./actions/universal-target-attributes.js'),
+    require('./actions/universal-alt-attribute.js'),
+    require('./actions/universal-set-external-links.js'),
+    require('./actions/universal-err-links.js'),
+    require('./actions/universal-remove-banners.js'),
+    // require('./actions/universal-fix-dropbox-links.js'),
 ];
 
 module.exports = (course, stepCallback) => {
@@ -67,22 +67,24 @@ module.exports = (course, stepCallback) => {
              * "template.actions" adds in the category's grandchildren. */
             var actions = [asyncLib.constant(course, item), ...universal, ...template.actions];
 
-            asyncLib.waterfall(actions, (waterErr, course, finalItem) => {
-                if (waterErr) {
-                    eachCallback(waterErr);
-                    return;
-                }
+            setTimeout(() => {
+                asyncLib.waterfall(actions, (waterErr, course, finalItem) => {
+                    if (waterErr) {
+                        eachCallback(waterErr);
+                        return;
+                    }
 
-                /* Compare the original to the finalItem to see if we need to update it in Canvas */
-                var diff = Object.keys(finalItem)
-                    .find(key => originalItem[key] !== finalItem[key] || finalItem.techops.delete === true);
+                    /* Compare the original to the finalItem to see if we need to update it in Canvas */
+                    var diff = Object.keys(finalItem)
+                        .find(key => originalItem[key] !== finalItem[key] || finalItem.techops.delete === true);
 
-                if (diff) {
-                    putTheItem(finalItem, eachCallback);
-                } else {
-                    eachCallback(null);
-                }
-            });
+                    if (diff) {
+                        putTheItem(finalItem, eachCallback);
+                    } else {
+                        eachCallback(null);
+                    }
+                });
+            }, 0);
         }
 
         /* Retrieve items from canvas, then send each to runTest() */
@@ -94,7 +96,7 @@ module.exports = (course, stepCallback) => {
             }
 
             /* Loop each item through their tests/actions */
-            asyncLib.eachLimit(items, 30, runTests, (eachErr) => {
+            asyncLib.eachLimit(items, 20, runTests, (eachErr) => {
                 if (eachErr) {
                     course.error(eachErr);
                 }

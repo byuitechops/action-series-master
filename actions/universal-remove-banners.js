@@ -30,7 +30,7 @@ module.exports = (course, item, callback) => {
             images.each((index, image) => {
                 var alt = $(image).attr('alt');
 
-                if (alt != '' || typeof alt != "undefined") {
+                if (alt !== '' && typeof alt !== 'undefined') {
                     if (alt.match(/course banner/gi)) {
                         $(image).remove();
 
@@ -42,7 +42,7 @@ module.exports = (course, item, callback) => {
             if (changeBool) {
                 item.techops.setHTML(item, $.html());
 
-                course.log(`Banner Removal`, {
+                course.log('Banner Removal', {
                     'Title': item.techops.getTitle(item)
                 });
             }
