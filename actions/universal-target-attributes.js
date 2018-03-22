@@ -11,10 +11,13 @@ module.exports = (course, item, callback) => {
 
         /* If there are links in the item and if the links are external, set target attribute to '_blank' */
         if (links.length !== 0) {
+            var oldTarget = '';
             links.forEach(link => {
-                var oldTarget = $(link).attr('target');
+                if ($(link).attr('target')) {
+                    oldTarget = $(link).attr('target');
+                }
                 /* Link is external if it does not include 'byui.instructure' in the href attribute */
-                if (!$(link).attr('href').includes('byui.instructure')) {
+                if ($(link).attr('href') && !$(link).attr('href').includes('byui.instructure')) {
                     /* If their is no 'target' attribute, or it is set to anything but '_blank'... */
                     if ($(link).attr('target') !== '_blank') {
                         /* Set new target to _blank */
