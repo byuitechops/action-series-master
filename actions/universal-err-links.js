@@ -61,7 +61,14 @@ module.exports = (course, item, callback) => {
         var links = $('a');
         var foundERR;
         if (links != undefined) {
-            links = links.filter((i, link) => !$(link).attr('href').includes('https://byui.instructure.com'));
+            links = links.filter((i, link) => {
+                if($(link).attr('href') !== undefined) {
+                    return !$(link).attr('href').includes('https://byui.instructure.com');
+                } else {
+                    course.message('Link without href attribute found');
+                    return false;
+                }
+            });
             links.each(function (i, link) {
                 link = $(link).attr('href').toLowerCase();
                 foundERR = externalResources.find(externalResource => externalResource.test(link));
