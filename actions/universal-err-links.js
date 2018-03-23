@@ -60,19 +60,22 @@ module.exports = (course, item, callback) => {
         var $ = cheerio.load(item.techops.getHTML(item));
         var links = $('a');
         var foundERR;
-        links = links.filter((i, link) => !$(link).attr('href').includes('https://byui.instructure.com'));
-        links.each(function (i, link) {
-            link = $(link).attr('href').toLowerCase();
-            foundERR = externalResources.find(externalResource => externalResource.test(link));
-            if (foundERR != undefined) {
-                course.log('ERR Identified', {
-                    'name': foundERR.toString().replace(/\//g, ''),
-                    'url': link,
-                    'item': item.techops.getTitle(item),
-                    'type': item.techops.type
-                });
-            }
-        });
+
+        if (links != undefined) {
+            links = links.filter((i, link) => !$(link).attr('href').includes('https://byui.instructure.com'));
+            links.each(function (i, link) {
+                link = $(link).attr('href').toLowerCase();
+                foundERR = externalResources.find(externalResource => externalResource.test(link));
+                if (foundERR != undefined) {
+                    course.log('ERR Identified', {
+                        'name': foundERR.toString().replace(/\//g, ''),
+                        'url': link,
+                        'item': item.techops.getTitle(item),
+                        'type': item.techops.type
+                    });
+                }
+            });
+        }
         callback(null, course, item);
     }
 
