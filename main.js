@@ -25,15 +25,23 @@ var universal = [
     require('./actions/universal-set-external-links.js'),
     require('./actions/universal-err-links.js'),
     require('./actions/universal-remove-banners.js'),
+    // require('./actions/universal-fix-dropbox-links.js'),
 ];
 
 module.exports = (course, stepCallback) => {
 
     function runSeries(template, seriesCallback) {
 
+        function confirmLogs(item) {
+            item.techops.logs.forEach(log => {
+                course.log(log.title, log.details);
+            });
+        }
+
         /* After tests/actions have run, PUT the object up to Canvas */
         function putTheItem(item, eachCallback) {
             if (course.info.checkStandards === true) {
+                confirmLogs(item);
                 eachCallback(null);
                 return;
             }
@@ -42,6 +50,7 @@ module.exports = (course, stepCallback) => {
                     eachCallback(err);
                     return;
                 }
+                confirmLogs(item);
                 eachCallback(null);
             });
         }
@@ -56,24 +65,26 @@ module.exports = (course, stepCallback) => {
              * The first function is just to inject the needed values into the waterfall.
              * "universal" adds in the grandchildren that need to run on every category.
              * "template.actions" adds in the category's grandchildren. */
-            var actions = [asyncLib.constant(course, item), ...universal/*, ...template.actions*/];
+            var actions = [asyncLib.constant(course, item), ...universal, ...template.actions];
 
-            asyncLib.waterfall(actions, (waterErr, course, finalItem) => {
-                if (waterErr) {
-                    eachCallback(waterErr);
-                    return;
-                }
+            setTimeout(() => {
+                asyncLib.waterfall(actions, (waterErr, course, finalItem) => {
+                    if (waterErr) {
+                        eachCallback(waterErr);
+                        return;
+                    }
 
-                /* Compare the original to the finalItem to see if we need to update it in Canvas */
-                var diff = Object.keys(finalItem)
-                    .find(key => originalItem[key] !== finalItem[key] || finalItem.techops.delete === true);
+                    /* Compare the original to the finalItem to see if we need to update it in Canvas */
+                    var diff = Object.keys(finalItem)
+                        .find(key => originalItem[key] !== finalItem[key] || finalItem.techops.delete === true);
 
-                if (diff) {
-                    putTheItem(finalItem, eachCallback);
-                } else {
-                    eachCallback(null);
-                }
-            });
+                    if (diff) {
+                        putTheItem(finalItem, eachCallback);
+                    } else {
+                        eachCallback(null);
+                    }
+                });
+            }, 0);
         }
 
         /* Retrieve items from canvas, then send each to runTest() */
@@ -85,7 +96,7 @@ module.exports = (course, stepCallback) => {
             }
 
             /* Loop each item through their tests/actions */
-            asyncLib.eachLimit(items, 30, runTests, (eachErr) => {
+            asyncLib.eachLimit(items, 20, runTests, (eachErr) => {
                 if (eachErr) {
                     course.error(eachErr);
                 }
@@ -96,7 +107,7 @@ module.exports = (course, stepCallback) => {
 
     asyncLib.eachSeries(templates, runSeries, (err) => {
         if (err) {
-            console.log(err);
+            course.error(err);
             stepCallback(err, course);
         } else {
             stepCallback(null, course);

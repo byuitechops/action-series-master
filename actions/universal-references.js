@@ -19,10 +19,10 @@ module.exports = (course, item, callback) => {
             reg: /((google\s*)?hangouts?(\s*on\s*air)?)|(HOA)/ig,
             type: 'Hangouts on Air References'
         }, {
-            reg: /\<a[^\>]*href=("|')[^"']*\.swf("|')\s*\>/ig,
+            reg: /<a[^>]*href=("|')[^"']*\.swf("|')\s*>/ig,
             type: '.swf Files'
         }, {
-            reg: /\<style\>/g,
+            reg: /<style>/g,
             type: 'Inline Styling'
         }];
 
