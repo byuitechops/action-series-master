@@ -128,7 +128,7 @@ module.exports = (course, item, callback) => {
     function constructCanvasAssignments(constructCanvasAssignmentsCallback) {
         canvas.get(`/api/v1/courses/${course.info.canvasOU}/assignments`, (getErr, assignments) => {
             if (getErr) {
-                constructCanvasAssignmentsCallback(err);
+                constructCanvasAssignmentsCallback(getErr);
                 return;
             }
             
@@ -253,8 +253,8 @@ module.exports = (course, item, callback) => {
             var newUrl = getCanvasUrl(link);
 
             //the Canvas Dropbox does not exist in the course
-            if (newUrl === '' || typeof newUrl === "undefined") {
-                course.error(`You may want to investigate this course a little bit more since a dropbox is missing.`);
+            if (newUrl === '' || typeof newUrl === 'undefined') {
+                course.error('You may want to investigate this course a little bit more since a dropbox is missing.');
                 return;
             } 
 
@@ -317,11 +317,11 @@ module.exports = (course, item, callback) => {
     function constructXMLAssignments(constructXMLAssigmentsCallback) {
         //retrieve the dropbox_d2l.xml file
         var dropbox = course.content.find((file) => {
-            return file.name === `dropbox_d2l.xml`;
+            return file.name === 'dropbox_d2l.xml';
         });
 
         //checking to see if the dropbox xml really has been found
-        if (typeof dropbox != "undefined") {
+        if (typeof dropbox != 'undefined') {
             var $ = dropbox.dom;
 
             //iterate through the xml nodes and retrieve the id and name 
@@ -337,7 +337,7 @@ module.exports = (course, item, callback) => {
 
             constructXMLAssigmentsCallback(null);
         } else {
-            constructXMLAssigmentsCallback(new Error(`dropbox_d2l.xml not found`));
+            constructXMLAssigmentsCallback(new Error('dropbox_d2l.xml not found'));
         }
     }
-}
+};

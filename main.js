@@ -25,7 +25,7 @@ var universal = [
     require('./actions/universal-set-external-links.js'),
     require('./actions/universal-err-links.js'),
     require('./actions/universal-remove-banners.js'),
-    // require('./actions/universal-fix-dropbox-links.js'),
+    require('./actions/universal-fix-dropbox-links.js'),
 ];
 
 module.exports = (course, stepCallback) => {
@@ -107,7 +107,7 @@ module.exports = (course, stepCallback) => {
 
     asyncLib.eachSeries(templates, runSeries, (err) => {
         if (err) {
-            console.log(err);
+            course.error(err);
             stepCallback(err, course);
         } else {
             stepCallback(null, course);
