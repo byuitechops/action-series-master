@@ -25,7 +25,7 @@ var universal = [
     require('./actions/universal-set-external-links.js'),
     require('./actions/universal-err-links.js'),
     require('./actions/universal-remove-banners.js'),
-    // require('./actions/universal-fix-dropbox-links.js'),
+    require('./actions/universal-fix-dropbox-links.js'),
 ];
 
 module.exports = (course, stepCallback) => {
