@@ -1,5 +1,5 @@
 const asyncLib = require('async');
-const canvas = require('canvas');
+const canvas = require('canvas-wrapper');
 const cheerio = require('cheerio');
 
 const check = 'CANVAS_COURSE_REFERENCE';
@@ -99,7 +99,15 @@ module.exports = (course, item, callback) => {
 
                     //get the ID and XML properties
                     if (url.includes(check)) {
-                        pageProperties.push(matchXMLPages(url, url.split('/').pop()));
+                        var obj = matchXMLPages(url, url.split('/').pop());
+
+                        //check to see if obj is empty object
+                        if (Object.keys(obj).length === 0) {
+                            throw new Error('Hmm, there is a problem with the course. An assignment never existed in Brightspace but is trying to exist in Canvas');
+                            return;
+                        } else {
+                            pageProperties.push(obj);
+                        }
                     }
                 });
 
@@ -146,11 +154,27 @@ module.exports = (course, item, callback) => {
      * correct page and returns the link for that page.
     ******************************************************************/
     function getCanvasUrl(link) {
-        var item = canvasPagesArray.find((canvasPage) => {
-            return canvasPage.name === link.d2l.page;
-        });
+        var thingsToNotTouch = [
+            'Dropbox',
+            'Assignment',
+        ];
 
-        return item.html_url;
+        var advance = (thingsToNotTouch.find((element) => {
+            return link.d2l.page.includes(element);
+        }));
+
+        console.log(`Advance: ${advance}`);
+        console.log(`link: ${link.d2l.page}`);
+
+        if (typeof advance === "undefined") {
+            var page = canvasPagesArray.find((canvasPage) => {
+                return link.d2l.page.includes(canvasPage.name);
+            });
+
+            return page.html_url;
+        } else {
+            return null;
+        }
     }
 
     /****************************************************************
@@ -169,6 +193,10 @@ module.exports = (course, item, callback) => {
         //obj to be fixed.
         pageProperties.forEach((link, i) => {
             var newUrl = getCanvasUrl(link);
+
+            if (!newUrl) {
+                return;
+            }
 
             if (newUrl === '' ||
                 typeof newUrl === 'undefined') {
@@ -200,7 +228,7 @@ module.exports = (course, item, callback) => {
     ******************************************************************/
     function repairLinks(brokenLinks) {
         var title = item.techops.getTitle(item);
-        var logName = 'Fixed Broken Dropbox Quicklinks';
+        var logName = 'Fixed Broken Description Quicklinks';
         var $ = cheerio.load(item.techops.getHTML(item));
         var links = $('a');
 
