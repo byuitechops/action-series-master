@@ -1,0 +1,56 @@
+const cheerio = require('cheerio');
+
+module.exports = (course, item, callback) => {
+
+    /* Pages to be renamed, in LOWER case */
+    var tagsToReplace = [{
+        oldTag: /<i>/g,
+        newTag: '<em>'
+    }, {
+        oldTag: /<\/i>/g,
+        newTag: '</em>'
+    }, {
+        oldTag: /<b>/g,
+        newTag: '<strong>'
+    }, {
+        oldTag: /<\/b>/g,
+        newTag: '</strong>'
+    }];
+
+    /* The test returns TRUE or FALSE - action() is called if true */
+    var found = tagsToReplace.find(reTag => reTag.oldTag.test(item.techops.getHTML(item)));
+
+
+    /* This is the action that happens if the test is passed */
+    function action() {
+        /* Log it with this title */
+        var logCategory = `${item.techops.type} - Replaced html tags`;
+
+        /* Get the html of the item */
+        var content = item.techops.getHTML(item);
+
+        /* For each outdated tag, replace it with the new tag */
+        tagsToReplace.forEach(tag => {
+            content = content.replace(tag.oldTag, tag.newTag);
+        });
+
+
+        /* Set the html that was changed */
+        item.techops.setHTML(item, content);
+
+        item.techops.log(logCategory, {
+            'Title': item.techops.getTitle(item),
+            'ID': item.techops.getID(item),
+        });
+        console.log('hello');
+
+        callback(null, course, item);
+    }
+
+    if (found != undefined) {
+        action();
+    } else {
+        callback(null, course, item);
+    }
+
+};

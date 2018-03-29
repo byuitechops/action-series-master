@@ -159,14 +159,11 @@ module.exports = (course, item, callback) => {
             'Assignment',
         ];
 
-        var advance = (thingsToNotTouch.find((element) => {
+        var isThingToNotTouch = (thingsToNotTouch.find((element) => {
             return link.d2l.page.includes(element);
         }));
 
-        console.log(`Advance: ${advance}`);
-        console.log(`link: ${link.d2l.page}`);
-
-        if (typeof advance === "undefined") {
+        if (typeof isThingToNotTouch === "undefined") {
             var page = canvasPagesArray.find((canvasPage) => {
                 return link.d2l.page.includes(canvasPage.name);
             });

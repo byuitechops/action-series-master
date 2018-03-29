@@ -27,6 +27,9 @@ var universal = [
     require('./actions/universal-err-links.js'),
     require('./actions/universal-remove-banners.js'),
     require('./actions/universal-fix-dropbox-links.js'),
+    require('./actions/universal-html-replace-tags.js'),
+    require('./actions/universal-description-quicklinks.js'),
+    require('./actions/universal-html-empty-tags.js'),
 ];
 
 module.exports = (course, stepCallback) => {
