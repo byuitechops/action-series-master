@@ -18,6 +18,7 @@ var templates = [
 /* Universal item actions */
 var universal = [
     require('./actions/universal-styling-div.js'),
+    // require('./actions/universal-html-deprecated-tags.js'),
     require('./actions/universal-rename.js'),
     require('./actions/universal-references.js'),
     require('./actions/universal-target-attributes.js'),
