@@ -34,7 +34,6 @@ module.exports = (course, item, callback) => {
             content = content.replace(tag.oldTag, tag.newTag);
         });
 
-
         /* Set the html that was changed */
         item.techops.setHTML(item, content);
 
@@ -42,7 +41,6 @@ module.exports = (course, item, callback) => {
             'Title': item.techops.getTitle(item),
             'ID': item.techops.getID(item),
         });
-        console.log('hello');
 
         callback(null, course, item);
     }
