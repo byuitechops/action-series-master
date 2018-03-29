@@ -1,4 +1,4 @@
-# Child Module Title
+# Action Series Master
 ### *Package Name*: action-series-master
 ### *Child Type*: Post Import
 ### *Platform*: Online 
