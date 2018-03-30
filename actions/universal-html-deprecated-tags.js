@@ -12,34 +12,65 @@ module.exports = (course, item, callback) => {
     function action() {
         // Load our html into cheerio
         var $ = cheerio.load(item.techops.getHTML(item));
+        var elements = {};
 
-        // Get the divs
-        var elements = elementsToKill.map(elName => $(`#${elName}`));
+        // Check if any exist
+        var none = true;
+        elementsToKill.forEach(el => {
+            elements[el] = $(`#${el}`);
+            if ($(elements[el]).length !== 0) none = false;
+        })
 
+        // Return if they're all empty
+        if (none === true) {
+            callback(null, course, item);
+            return;
+        }
+
+        // Decide where to copy to
         var topLevel = true;
         if ($('.byui').length > 0) {
             topLevel = false;
         }
 
-        elements.forEach(el => {
-            var contents = $(el).html();
-            if (topLevel === true) {
-                // Append to the top level element
-                $.root().append(contents).html();
-            } else {
-                // Append to the byui styling div
-                $('.byui').append(contents).html();
-            }
-        });
 
-        // Delete the divs
-        elements.forEach(el => $(el).remove());
+        // Object.keys(elements).forEach(key => {
+
+        $('#main').replaceWith($('#main').contents());
+
+
+        //     var contents = $(elements[key]).html();
+        //     console.log(key, contents.length);
+        //     if (topLevel === true) {
+        //         // Append to the top level element
+        //         $.root().append(contents);
+        //     } else {
+        //         // Append to the byui styling div
+        //         $('.byui').append(contents);
+        //     }
+        // });
+        console.log($.html());
+
+        // // Delete the divs
+        // elementsToKill.forEach(el => {
+        //     $(`#${el}`).remove();
+        // });
+
+        // // remove the div attribute
+        // elementsToKill.forEach(el => {
+        //     $(`#${el}`).removeAttr('div');
+        // });
+
+        // replace the div with the content of the div
+        // elementsToKill.forEach(el => {
+        //     $(`#${el}`).replaceWith($(`#${el}`).html());
+        // })
 
         // Set the new HTML on the object
-        item.techops.setHTML(item, $('body').html());
+        item.techops.setHTML(item, $.html());
 
         // Log it
-        item.techops.log(`${item.techops.type} - Styling Div Inserted`, {
+        item.techops.log(`${item.techops.type} - Deprecated Tags`, {
             'Title': item.techops.getTitle(item),
             'ID': item.techops.getID(item)
         });
