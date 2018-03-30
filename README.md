@@ -1,4 +1,4 @@
-# Child Module Title
+# Action Series Master
 ### *Package Name*: action-series-master
 ### *Child Type*: Post Import
 ### *Platform*: Online 
@@ -41,3 +41,4 @@ Please review the documentation for each action-series template.
 ## Requirements
 
 Please review the documentation for each action-series template.
+

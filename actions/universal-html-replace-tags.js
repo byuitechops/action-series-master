@@ -20,6 +20,7 @@ module.exports = (course, item, callback) => {
     /* The test returns TRUE or FALSE - action() is called if true */
     var found = tagsToReplace.find(reTag => reTag.oldTag.test(item.techops.getHTML(item)));
 
+
     /* This is the action that happens if the test is passed */
     function action() {
         /* Log it with this title */
@@ -32,9 +33,9 @@ module.exports = (course, item, callback) => {
         tagsToReplace.forEach(tag => {
             content = content.replace(tag.oldTag, tag.newTag);
         });
-        
+
         /* Set the html that was changed */
-        item.techops.setHTML(content);
+        item.techops.setHTML(item, content);
 
         item.techops.log(logCategory, {
             'Title': item.techops.getTitle(item),
