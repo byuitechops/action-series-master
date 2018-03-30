@@ -87,8 +87,12 @@ module.exports = (course, item, callback) => {
         } else {
             //checking to see if a link meetings the criteria
             $(links).each((i, link) => {
-                if ($(link).attr('href').indexOf(check) != -1) {
-                    pageLink = true;
+                if (typeof $(link).attr('href') != "undefined" &&
+                    $(link).attr('href') != null) {
+                
+                    if ($(link).attr('href').indexOf(check) != -1) {
+                        pageLink = true;
+                    }
                 }
             });
 
@@ -103,7 +107,7 @@ module.exports = (course, item, callback) => {
 
                         //check to see if obj is empty object
                         if (Object.keys(obj).length === 0) {
-                            throw new Error('Hmm, there is a problem with the course. An assignment never existed in Brightspace but is trying to exist in Canvas');
+                            throw new Error('Hmm, there is a problem with the course. An assignment never existed in Brightspace but is trying to exist in Canvas somehow.');
                             return;
                         } else {
                             pageProperties.push(obj);
