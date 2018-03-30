@@ -160,8 +160,12 @@ module.exports = (course, item, callback) => {
             //links are found. let's check each to see if they are dropbox links
         } else {
             $(links).each((index, link) => {
-                if ($(link).attr('href').indexOf('drop_box') != -1) {
-                    itemDropboxLink = true;
+                if (typeof $(link).attr('href') != "undefined" &&
+                    $(link).attr('href') != null) {
+                
+                    if ($(link).attr('href').indexOf('drop_box') != -1) {
+                        itemDropboxLink = true;
+                    }
                 }
             });
 
@@ -280,7 +284,7 @@ module.exports = (course, item, callback) => {
     ******************************************************************/
     function repairLinks(brokenLinks) {
         var title = item.techops.getTitle(item);
-        var logName = 'Fixed Broken Dropbox Quicklinks';
+        var logName = 'Fixed Broken Dropbox Links';
         var $ = cheerio.load(item.techops.getHTML(item));
         var links = $('a');
 
@@ -295,8 +299,8 @@ module.exports = (course, item, callback) => {
 
             //log to make life easier for everyone
             course.log(logName, {
-                'badLink': item.badLink,
-                'newLink': item.newLink,
+                'Bad Link': item.badLink,
+                'New Link': item.newLink,
                 'page': title,
             });
         });
