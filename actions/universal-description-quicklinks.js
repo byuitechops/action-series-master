@@ -262,9 +262,6 @@ module.exports = (course, item, callback) => {
      * stuff that we need for the grandchild.
     ******************************************************************/
     function buildXMLArray(buildXMLArrayCallback) {
-        //this is the path for the module in imsmanifest.xml
-        var path = 'manifest > organizations > organization > item > item';
-
         //find file location
         var file = course.content.find((file) => {
             return file.name === 'imsmanifest.xml';
@@ -276,16 +273,11 @@ module.exports = (course, item, callback) => {
             return;
         }
 
-        //this goes through and builds the array to what we need.
         var $ = file.dom;
-        $(path).each((index, module) => {
-            var obj = {
-                'code': module.attribs.identifier,
-                'page': module.children[1].children[0].data,
-            }
 
-            xmlArray.push(obj);
-        });
+        console.log($('item item title').map((i, element) => {
+            return $(element).text();
+        }).get());
 
         buildXMLArrayCallback(null);
     }
