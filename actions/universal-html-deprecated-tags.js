@@ -19,7 +19,7 @@ module.exports = (course, item, callback) => {
         elementsToKill.forEach(el => {
             elements[el] = $(`#${el}`);
             if ($(elements[el]).length !== 0) none = false;
-        })
+        });
 
         // Return if they're all empty
         if (none === true) {
@@ -27,44 +27,10 @@ module.exports = (course, item, callback) => {
             return;
         }
 
-        // Decide where to copy to
-        var topLevel = true;
-        if ($('.byui').length > 0) {
-            topLevel = false;
+        // Replace the specified element with the contents of the element removing the tag
+        for (let i = 0; i < elementsToKill.length; i++) {
+            $(`#${elementsToKill[i]}`).replaceWith($(`#${elementsToKill[i]}`).contents());
         }
-
-
-        // Object.keys(elements).forEach(key => {
-
-        $('#main').replaceWith($('#main').contents());
-
-
-        //     var contents = $(elements[key]).html();
-        //     console.log(key, contents.length);
-        //     if (topLevel === true) {
-        //         // Append to the top level element
-        //         $.root().append(contents);
-        //     } else {
-        //         // Append to the byui styling div
-        //         $('.byui').append(contents);
-        //     }
-        // });
-        console.log($.html());
-
-        // // Delete the divs
-        // elementsToKill.forEach(el => {
-        //     $(`#${el}`).remove();
-        // });
-
-        // // remove the div attribute
-        // elementsToKill.forEach(el => {
-        //     $(`#${el}`).removeAttr('div');
-        // });
-
-        // replace the div with the content of the div
-        // elementsToKill.forEach(el => {
-        //     $(`#${el}`).replaceWith($(`#${el}`).html());
-        // })
 
         // Set the new HTML on the object
         item.techops.setHTML(item, $.html());
@@ -77,7 +43,6 @@ module.exports = (course, item, callback) => {
 
         callback(null, course, item);
     }
-
 
     /* If the item is marked for deletion, has no HTML to work with, or is the front page for the course, do nothing */
     if (item.techops.delete === true ||
