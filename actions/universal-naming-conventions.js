@@ -10,11 +10,11 @@ module.exports = (course, item, callback) => {
         /* Get the item title */
         var title = item.techops.getTitle(item);
         /* Get each word in the module title */
-        var modTitleArray = title.split(' ');
+        var titleArray = title.split(' ');
 
         /* Get the week number from the module title */
         /* Add 0 to week number if not present */
-        modTitleArray.forEach((currWord, index) => {
+        titleArray.forEach((currWord, index) => {
             /* If the current word follows this convention: L14, W01, L2, W9, etc */
             if (/(l|w)(0?\d?\d)(\D|$)/gi.test(currWord)) {
                 /* Spit the current word into a character array */
@@ -25,12 +25,6 @@ module.exports = (course, item, callback) => {
                         weekNum += theChar;
                     }
                 });
-
-                /* If the current word is 'week' or 'lesson' */
-            } else if (/week|lesson/gi.test(currWord) && typeof modTitleArray[index + 1] !== 'undefined') {
-                /* Replace each non-digit in the title with nothing */
-                /* index + 1 because the week number normally follows the word 'week' or 'lesson' */
-                weekNum = modTitleArray[index + 1].replace(/\D+/g, '');
             }
 
             /* Add 0 to the beginning of the number if weekNum is a single digit */
@@ -49,8 +43,9 @@ module.exports = (course, item, callback) => {
      *******************************************************************/
     function checkForPrefix() {
         /* Get each word in the module item title */
-        if (typeof item.title !== 'undefined') {
-            var itemTitleArray = item.title.split(' ');
+        if (typeof item.techops.getTitle(item) !== 'undefined') {
+            var title = item.techops.getTitle(item);
+            var itemTitleArray = title.split(' ');
         } else {
             var itemTitleArray = '';
         }
@@ -58,9 +53,9 @@ module.exports = (course, item, callback) => {
         /* If the title is only one word or less, don't modify it */
         if (itemTitleArray.length <= 1) {
             return item.title;
-        } 
+        }
 
-        /* Check for already existing prefixes in the module item titles */
+        /* Check for already existing prefixes in the titles */
         itemTitleArray.forEach((currWord, index) => {
             /* Get rid of L02, W14:, L3, W4 etc. */
             if (/(l|w)(0?\d?\d)(\D|$)/gi.test(currWord)) {
@@ -78,16 +73,23 @@ module.exports = (course, item, callback) => {
     function modifyItemTitle() {
         var weekNum = getWeekNum();
         var modifiedTitle = checkForPrefix();
-        var oldTitle = item.title;
+        var oldTitle = item.techops.getTitle(item);
         var newTitle = '';
 
+        /* If the activity type is Quiz or Discussion, put it in the title. Else, put '_ActivityType_' */
+        if (item.techops.type === 'Quiz' || item.techops.type === 'Discussion') {
+            newTitle = `W${weekNum} ${item.techops.type}: ${modifiedTitle}`;
+        } else {
+            newTitle = `W${weekNum} _ActivityType_: ${modifiedTitle}`;
+        }
+
         /* Set the new title for the PUT object */
-        item.title = newTitle;
+        item.techops.setTitle(item, newTitle);
 
         item.techops.log(`${item.techops.type} - Naming Conventions Added`, {
             'Old Title': oldTitle,
             'New Title': newTitle,
-            'ID': item.id,
+            'ID': item.techops.getID(item),
         });
 
         callback(null, course, item);
@@ -104,7 +106,7 @@ module.exports = (course, item, callback) => {
 
     /* If the item title has 'L01, W12, L4, W06, etc', then we will change the name */
     var changeItem = /(l|w)(0?\d?\d)(\D|$)/gi.test(item.techops.getTitle(item));
-    
+
     /* items with specific naming conventions, in LOWER case */
     var specialItems = [
         /lesson\s*notes/gi, // W[##] Lesson Notes  (Do NOT Publish)
@@ -112,7 +114,7 @@ module.exports = (course, item, callback) => {
     ];
 
     /* if the item is in a weekly module, call modifyModuleItemTitle() */
-    if (changeItem && item.techops.type !== 'Module Item' && item.techops.type !== 'File') {
+    if (changeItem && item.techops.type !== 'Module' && item.techops.type !== 'File') {
         modifyItemTitle();
     } else {
         callback(null, course, item);
