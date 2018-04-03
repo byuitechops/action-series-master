@@ -7,12 +7,12 @@ module.exports = (course, item, callback) => {
     //from overview pages.
     if (item.techops.delete === true ||
         item.techops.getHTML(item) === null ||
-        item.techops.getTitle(item).match(/overview/gi)) {
+        /overview/gi.test(item.techops.getTitle(item))) {
         callback(null, course, item);
         return;
     } else {
         processItem();
-        callback(null, course, item);
+        callback(null, course, item); 
     }
 
     function processItem() {
@@ -24,14 +24,14 @@ module.exports = (course, item, callback) => {
         //taken out of the page.
         var changeBool = false;
 
-        if (images.length < 0) {
+        if (images.length === 0) {
             return;
         } else {
             images.each((index, image) => {
                 var alt = $(image).attr('alt');
 
                 if (alt !== '' && typeof alt !== 'undefined') {
-                    if (alt.match(/course banner/gi)) {
+                    if (/course banner/gi.test(alt)) {
                         $(image).remove();
                         changeBool = true;
                     }
@@ -41,7 +41,7 @@ module.exports = (course, item, callback) => {
             if (changeBool) {
                 item.techops.setHTML(item, $.html());
 
-                course.log('Banner Removal', {
+                item.techops.log('Banner Removal', {
                     'Title': item.techops.getTitle(item)
                 });
             }
