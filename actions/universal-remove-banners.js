@@ -30,7 +30,7 @@ module.exports = (course, item, callback) => {
             images.each((index, image) => {
                 var alt = $(image).attr('alt');
 
-                if (alt !== '' && typeof alt !== 'undefined') {
+                if (alt !== '' && alt === 'undefined') {
                     if (/course banner/gi.test(alt)) {
                         $(image).remove();
                         changeBool = true;
