@@ -10,7 +10,8 @@ module.exports = (course, item, callback) => {
     var itemDropboxLink = false;
 
     //no need to check items that will be deleted
-    if (item.techops.delete === true || item.techops.getHTML(item) === null) {
+    if (item.techops.delete === true ||
+        item.techops.getHTML(item) === null) {
         callback(null, course, item);
         return;
     }
@@ -23,7 +24,7 @@ module.exports = (course, item, callback) => {
      * This function acts as a driver for the program. It waterfalls 
      * all of the functions.
     ******************************************************************/
-    function beginProcess(beginProcessCallback) {
+    function beginProcess() {
         //ensure that the arrays are correctly populated before
         //starting the repairLinks grandchild.
         //checkArrays is done in async.
@@ -104,7 +105,7 @@ module.exports = (course, item, callback) => {
         if (canvasAssignments.length < 1) {
             constructCanvasAssignments((err) => {
                 if (err) {
-                    buildXMLArrayCallback(err);
+                    buildCanvasArrayCallback(err);
                     return;
                 }
 
@@ -155,33 +156,18 @@ module.exports = (course, item, callback) => {
         var links = $('a');
 
         //no links are found on the page so return!
-        if (links.length < 0) {
+        if (links.length === 0) {
             return;
             //links are found. let's check each to see if they are dropbox links
         } else {
-            $(links).each((index, link) => {
-                if (typeof $(link).attr('href') != "undefined" &&
-                    $(link).attr('href') != null) {
-                
-                    if ($(link).attr('href').indexOf('drop_box') != -1) {
-                        itemDropboxLink = true;
-                    }
-                }
-            });
+            var arr = $(links).filter((i, link) => $(link).attr('href').includes('drop_box'));
 
-            //we have found one ore more dropbox links.
-            if (itemDropboxLink) {
-                $(links).each((index, link) => {
+            if (arr.length > 0) {
+                arr.each((index, link) => {
                     var url = $(link).attr('href');
+                    var srcId = url.split('drop_box_').pop();
 
-                    if (url.includes('drop_box_')) {
-                        var srcId = url.split('drop_box_').pop();
-
-                        //retrieve correct XML object to retrieve link
-                        var itemProperties = matchXMLAssignments(url, srcId);
-                        itemPropertiesArray.push(...itemProperties);
-                    }
-
+                    itemPropertiesArray.push(...matchXMLAssignments(url, srcId));
                 });
 
                 //pass array in to get correct Canvas dropbox
@@ -231,15 +217,10 @@ module.exports = (course, item, callback) => {
      * This function makes an API call to the assignments to obtain the
      * correct url for the dropbox.
     ******************************************************************/
-    function getCanvasUrl(link) {
-        //find the Canvas assignment that we are looking for.
-        var item = canvasAssignments.find((canvasAssignment) => {
-            return canvasAssignment.name === link.d2l.name;
-        });
-
-        //we only need html_url so this does it for us
-        return item.html_url;
-    }
+   function getCanvasUrl(link) {
+    //find the Canvas assignment that we are looking for.
+    return canvasAssignments.find(canvasAssignment => canvasAssignment.name === link.d2l.name);
+}
 
     /****************************************************************
      * getCorrectLinks
@@ -252,20 +233,20 @@ module.exports = (course, item, callback) => {
     function getCorrectLinks(itemPropertiesArray) {
         var brokenLinks = [];
 
-        itemPropertiesArray.forEach((link, index) => {
+        itemPropertiesArray.forEach((link) => {
             //retrieve correct Dropbox link
             var newUrl = getCanvasUrl(link);
 
             //the Canvas Dropbox does not exist in the course
-            if (newUrl === '' || typeof newUrl === 'undefined') {
-                course.error('You may want to investigate this course a little bit more since a dropbox is missing.');
+            if (newUrl === null || newUrl === undefined) {
+                course.warning('You may want to investigate this course a little bit more since a dropbox is missing.');
                 return;
             } 
 
             //build object and add to array to help repairLinks have an easier time
             brokenLinks.push({
                 'badLink': link.url,
-                'newLink': newUrl
+                'newLink': newUrl.html_url
             });
 
         });
@@ -292,15 +273,15 @@ module.exports = (course, item, callback) => {
         //bad link with the proper link. In addition, the way this is 
         //set up, it'll fix all of the occurrences of the same link
         //if needed.
-        brokenLinks.forEach((item) => {
+        brokenLinks.forEach((element) => {
             links.attr('href', (index, link) => {
-                return link.replace(item.badLink, item.newLink);
+                return link.replace(element.badLink, element.newLink);
             });
 
             //log to make life easier for everyone
-            course.log(logName, {
-                'Bad Link': item.badLink,
-                'New Link': item.newLink,
+            item.techops.log(logName, {
+                'Bad Link': element.badLink,
+                'New Link': element.newLink,
                 'page': title,
             });
         });
@@ -320,12 +301,10 @@ module.exports = (course, item, callback) => {
     ******************************************************************/
     function constructXMLAssignments(constructXMLAssigmentsCallback) {
         //retrieve the dropbox_d2l.xml file
-        var dropbox = course.content.find((file) => {
-            return file.name === 'dropbox_d2l.xml';
-        });
+        var dropbox = course.content.find(file => file.name === 'dropbox_d2l.xml');
 
         //checking to see if the dropbox xml really has been found
-        if (typeof dropbox != 'undefined') {
+        if (dropbox !== undefined) {
             var $ = dropbox.dom;
 
             //iterate through the xml nodes and retrieve the id and name 
