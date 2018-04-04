@@ -3,9 +3,8 @@ module.exports = (course, item, callback) => {
      * Find the week number for each module item from its parent module's title. If the 
      * week number is only one digit long, append a zero to the beginning of the number.
      ************************************************************************************/
-    function getWeekNum() {
+    function getWeekNum(title) {
         var weekNum = '';
-        var title = item.techops.getTitle(item);
 
         /* If the parent module doesn't have a name, or if the module 
         item is not housed in a module at all, return an empty string */
@@ -55,14 +54,13 @@ module.exports = (course, item, callback) => {
      * If one exists, delete it before creating a new one in modifyModuleItemTitle().
      * Ex: L1, W02, Lesson 03, Week 4 
      *******************************************************************/
-    function removePrefix() {
-        var itemTitleArray = '';
-        var title = '';
-
-        /* Get each word in the module item title */
-        if (typeof item.techops.getTitle(item) !== 'undefined') {
-            title = item.techops.getTitle(item);
-            itemTitleArray = title.split(' ');
+    function removePrefix(title, itemTitleArray) {
+        /* If it is a discussion or quiz AND it already has the prefix 'Wxx _ActivityType_:' then get rid of the prefix */
+        if (item.techops.type === 'Discussion' || item.techops.type === 'Quiz') {
+            if (title.match(/W\d\d\s_ActivityType_:/)) {
+                itemTitleArray.splice(0, 2);
+                return itemTitleArray.join(' ');
+            }
         }
 
         /* If the title is only one word or less, don't modify it */
@@ -70,24 +68,10 @@ module.exports = (course, item, callback) => {
             return title;
         }
 
-        var badItemTypes = [
-            /_ActivityType_:/gi,
-            /Discussion:/gi,
-            /Quiz:/gi,
-        ];
-
-        // var badType = badItemTypes.find(itemType => itemType.test(title)); // True if the current item is part of the badItemTypes array
-
         /* Check for already existing prefixes in the titles */
         itemTitleArray.forEach((currWord, index) => {
             /* Get rid of L02, W14:, L3, W4 etc. */
             if (/(l|w)(0?\d?\d)(\D|$)/gi.test(currWord)) {
-                /* Only change the prefix/title if the item hasn't been changed already */
-                console.log(badItemTypes.find(itemType => itemType.test(itemTitleArray[index + 1])));
-                if (itemTitleArray[index + 1] !== 'undefined' && badItemTypes.find(itemType => itemType.test(itemTitleArray[index + 1])) !== 'undefined') {
-                    console.log(`return null`);
-                    return null;
-                }
                 itemTitleArray.splice(index, 1);
             }
         });
@@ -100,20 +84,28 @@ module.exports = (course, item, callback) => {
      * This is the function that happens if the test is passed 
      *********************************************************/
     function modifyItemTitle() {
-        var weekNum = getWeekNum();
-        var modifiedTitle = removePrefix();
-        var oldTitle = item.techops.getTitle(item);
+        var title = '';
+        var itemTitleArray = '';
+
+        /* Get each word in the module item title */
+        if (item.techops.getTitle(item) !== undefined) {
+            title = item.techops.getTitle(item);
+            itemTitleArray = title.split(' ');
+        }
+
+        var weekNum = getWeekNum(title);
+        var modifiedTitle = removePrefix(title, itemTitleArray);
+        var oldTitle = title;
         var newTitle = '';
 
         /* Decide how to format the new title */
-        if (!modifiedTitle) {
-            callback(null, course, item);
-            return;
-        } else if (specialNaming) {
+        if (specialNaming) {
             newTitle = `W${weekNum} ${modifiedTitle}`;
         } else if (item.techops.type === 'Quiz' || item.techops.type === 'Discussion') {
             newTitle = `W${weekNum} ${item.techops.type}: ${modifiedTitle}`;
-        } else {
+        } else if ((!title.match(/W\d\d\s_ActivityType_:/)) &&
+            (!title.match(/W\d\d\sDiscussion:/)) &&
+            (!title.match(/W\d\d\sQuiz:/))) {
             newTitle = `W${weekNum} _ActivityType_: ${modifiedTitle}`;
         }
 
@@ -145,25 +137,28 @@ module.exports = (course, item, callback) => {
     ];
 
     /* An array of module items NOT to change */
-    var moduleItemSkipList = [
+    var skipItems = [
         /orientation\s*to\s*online\s*learning/gi,
         /syllabus/gi,
     ];
 
-    var changeItem = /(l|w)(0?\d?\d)(\D|$)/gi.test(item.techops.getTitle(item)); // True if item title has 'L01, W12, L4, W06, etc'
+    var title = '';
+    if (item.techops.getTitle(item) !== undefined) {
+        title = item.techops.getTitle(item);
+    }
+    var changeItem = /(l|w)(0?\d?\d)(\D|$)/gi.test(title); // True if item title has 'L01, W12, L4, W06, etc'
     var specialNaming = specialItems.find(special => special.test(item.title)); // True if the current item has a special naming convention
-    var skip = moduleItemSkipList.find(currItem => currItem.test(item.title)); // True if the current item shouldn't run on this grandchild
+    var skip = skipItems.find(currItem => currItem.test(item.title)); // True if the current item shouldn't run on this grandchild
     var weeklyModule = false;
 
-    /* TRUE if the item is in a weekly module */
+    /* Changes weeklyModule to TRUE if the item is in a weekly module */
     if (typeof item.techops.parentModule !== 'undefined') {
         weeklyModule = /(Week|Lesson|L|W)\s*(\d*(\D|$))/gi.test(item.techops.parentModule.name);
     }
 
     /* if the item is a module item, call one function, else call another */
-    if (item.techops.type === 'Module Item' && weeklyModule && skip !== true && item.type !== 'SubHeader') {
-        modifyItemTitle();
-    } else if (changeItem && item.techops.type !== 'Module Item' && item.techops.type !== 'Module' && item.techops.type !== 'File') {
+    if ((item.techops.type === 'Module Item' && weeklyModule && !skip && item.type !== 'SubHeader') ||
+        (changeItem && item.techops.type !== 'Module Item' && item.techops.type !== 'Module' && item.techops.type !== 'File')) {
         modifyItemTitle();
     } else {
         callback(null, course, item);
