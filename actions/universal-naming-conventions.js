@@ -87,7 +87,7 @@ module.exports = (course, item, callback) => {
         var title = '';
         var itemTitleArray = '';
 
-        /* Get each word in the module item title */
+        /* Get each word in the module item title, if a title exists */
         if (item.techops.getTitle(item) !== undefined) {
             title = item.techops.getTitle(item);
             itemTitleArray = title.split(' ');
@@ -97,27 +97,44 @@ module.exports = (course, item, callback) => {
         var modifiedTitle = removePrefix(title, itemTitleArray);
         var oldTitle = title;
         var newTitle = '';
+        var doChange = false; // Will be set to true if any changes are to be made to the title in the following if statements
 
         /* Decide how to format the new title */
+        /* If it is an item with a special naming convention */
         if (specialNaming) {
             newTitle = `W${weekNum} ${modifiedTitle}`;
+            doChange = true;
+            /* If it is a quiz or discussion, put the type in the title */
         } else if (item.techops.type === 'Quiz' || item.techops.type === 'Discussion') {
             newTitle = `W${weekNum} ${item.techops.type}: ${modifiedTitle}`;
+            doChange = true;
+            /* If it doesn't already have the correct prefix, put it on  */
         } else if ((!title.match(/W\d\d\s_ActivityType_:/)) &&
             (!title.match(/W\d\d\sDiscussion:/)) &&
             (!title.match(/W\d\d\sQuiz:/))) {
             newTitle = `W${weekNum} _ActivityType_: ${modifiedTitle}`;
+            doChange = true;
         }
 
-        /* Set the new title for the PUT object */
-        item.techops.setTitle(item, newTitle);
+        /* If the last word of the title is the same as the assignment type, delete the word from the title */
+        var newTitleArray = newTitle.split(' ');
+        if (item.type === newTitleArray[newTitleArray.length - 1].trim()) {
+            newTitleArray.splice(-1, 1);
+        }
 
-        item.techops.log(`${item.techops.type} - Naming Conventions Added`, {
-            'Old Title': oldTitle,
-            'New Title': newTitle,
-            'ID': item.techops.getID(item),
-        });
+        /* Join on the blank spaces */
+        newTitle = newTitleArray.join(' ');
 
+        if (doChange) {
+            /* Set the new title for the PUT object */
+            item.techops.setTitle(item, newTitle);
+
+            item.techops.log(`${item.techops.type} - Naming Conventions Added`, {
+                'Old Title': oldTitle,
+                'New Title': newTitle,
+                'ID': item.techops.getID(item),
+            });
+        }
         callback(null, course, item);
     }
 
@@ -154,6 +171,13 @@ module.exports = (course, item, callback) => {
     /* Changes weeklyModule to TRUE if the item is in a weekly module */
     if (typeof item.techops.parentModule !== 'undefined') {
         weeklyModule = /(Week|Lesson|L|W)\s*(\d*(\D|$))/gi.test(item.techops.parentModule.name);
+    }
+
+    /* If it's a quiz or discussion type assignment, skip it because the naming convention will take care */
+    /* of it as a quiz or discussion separately, rather than doing it a second time as an assignment */
+    if (item.techops.type === 'Assignment' && (item.quiz_id !== undefined || item.discussion_topic !== undefined)) {
+        callback(null, course, item);
+        return;
     }
 
     /* if the item is a module item, call one function, else call another */
