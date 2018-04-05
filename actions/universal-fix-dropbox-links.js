@@ -7,8 +7,6 @@ var canvasAssignments = [];
 
 module.exports = (course, item, callback) => {
 
-    var itemDropboxLink = false;
-
     //no need to check items that will be deleted
     if (item.techops.delete === true ||
         item.techops.getHTML(item) === null) {
@@ -193,7 +191,7 @@ module.exports = (course, item, callback) => {
     function matchXMLAssignments(url, srcId) {
         var itemProperties = [];
 
-        xmlAssignments.forEach((xmlAssignment, index) => {
+        xmlAssignments.forEach((xmlAssignment) => {
             if (srcId === xmlAssignment.id) {
 
                 //build object to make life easier
@@ -217,10 +215,10 @@ module.exports = (course, item, callback) => {
      * This function makes an API call to the assignments to obtain the
      * correct url for the dropbox.
     ******************************************************************/
-   function getCanvasUrl(link) {
+    function getCanvasUrl(link) {
     //find the Canvas assignment that we are looking for.
-    return canvasAssignments.find(canvasAssignment => canvasAssignment.name === link.d2l.name);
-}
+        return canvasAssignments.find(canvasAssignment => canvasAssignment.name === link.d2l.name);
+    }
 
     /****************************************************************
      * getCorrectLinks
