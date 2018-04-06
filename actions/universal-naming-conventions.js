@@ -118,7 +118,7 @@ module.exports = (course, item, callback) => {
 
         /* If the last word of the title is the same as the assignment type, delete the word from the title */
         var newTitleArray = newTitle.split(' ');
-        if (item.type === newTitleArray[newTitleArray.length - 1].trim()) {
+        if ((item.type === 'Quiz' || item.type === 'Discussion') && item.type === newTitleArray[newTitleArray.length - 1].trim()) {
             newTitleArray.splice(-1, 1);
         }
 
@@ -159,6 +159,8 @@ module.exports = (course, item, callback) => {
         /syllabus/gi,
     ];
 
+    /* For some reason, there was an item in testing with no title and it threw an error. */
+    /* Checking for a title to avoid this. */
     var title = '';
     if (item.techops.getTitle(item) !== undefined) {
         title = item.techops.getTitle(item);
