@@ -9,7 +9,8 @@ module.exports = (course, item, callback) => {
 
     //no need to check items that will be deleted
     if (item.techops.delete === true ||
-        item.techops.getHTML(item) === null) {
+        item.techops.getHTML(item) === null ||
+        course.settings.platform === 'campus') {
         callback(null, course, item);
         return;
     }
