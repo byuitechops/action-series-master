@@ -25,7 +25,7 @@ module.exports = (course, item, callback) => {
      * beginProcess
      * 
      * This function acts as a driver for the program. It waterfalls 
-     * all of the functions.
+     * all of the functions and makes sure that they are completed.
     ******************************************************************/
     function beginProcess() {
         //ensure that the arrays are correctly populated before
