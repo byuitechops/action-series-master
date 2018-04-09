@@ -10,7 +10,8 @@ module.exports = (course, item, callback) => {
     var pageLink = false;
 
     if (item.techops.delete === true ||
-        item.techops.getHTML(item) === null) {
+        item.techops.getHTML(item) === null ||
+        course.settings.platform === 'campus') {
         
         callback(null, course, item);
         return;
