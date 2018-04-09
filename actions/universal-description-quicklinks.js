@@ -8,10 +8,13 @@ var canvasPagesArray = [];
 
 module.exports = (course, item, callback) => {
     var pageLink = false;
+    var validPlatforms = [
+        'online'
+    ];
 
     if (item.techops.delete === true ||
         item.techops.getHTML(item) === null ||
-        course.settings.platform === 'campus') {
+        !validPlatforms.includes(course.settings.platform)) {
         
         callback(null, course, item);
         return;
