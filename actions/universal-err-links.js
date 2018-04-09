@@ -62,7 +62,7 @@ module.exports = (course, item, callback) => {
         var foundERR;
         if (links != undefined) {
             links = links.filter((i, link) => {
-                if($(link).attr('href') !== undefined) {
+                if ($(link).attr('href') !== undefined) {
                     return !$(link).attr('href').includes('https://byui.instructure.com');
                 } else {
                     course.message('Link without href attribute found');
@@ -87,7 +87,8 @@ module.exports = (course, item, callback) => {
 
 
     /* If the item is marked for deletion, do nothing */
-    if (item.techops.delete === true || item.techops.getHTML(item) === null) {
+    var validPlatforms = ['online', 'pathway', 'campus'];
+    if (item.techops.delete === true || item.techops.getHTML(item) === null || !validPlatforms.includes(course.settings.platform)) {
         callback(null, course, item);
         return;
     } else {
