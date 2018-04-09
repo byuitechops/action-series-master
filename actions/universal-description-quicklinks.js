@@ -1,4 +1,3 @@
-const asyncLib = require('async');
 const canvas = require('canvas-wrapper');
 const cheerio = require('cheerio');
 
@@ -8,7 +7,6 @@ var xmlArray = [];
 var canvasPagesArray = [];
 
 module.exports = (course, item, callback) => {
-    //only add the platforms your grandchild should run in
     var validPlatforms = ['online', 'pathway', 'campus'];
     var validPlatform = validPlatforms.includes(course.settings.platform);
     
@@ -92,7 +90,7 @@ module.exports = (course, item, callback) => {
         } else {
             //checking to see if a link meetings the criteria
             $(links).each((i, link) => {
-                if (typeof $(link).attr('href') != "undefined" &&
+                if (typeof $(link).attr('href') != 'undefined' &&
                     $(link).attr('href') != null) {
 
                     if ($(link).attr('href').indexOf(check) != -1) {
@@ -113,7 +111,6 @@ module.exports = (course, item, callback) => {
                         //check to see if obj is empty object
                         if (Object.keys(obj).length === 0) {
                             throw new Error('Hmm, there is a problem with the course. An assignment never existed in Brightspace but is trying to exist in Canvas somehow.');
-                            return;
                         } else {
                             pageProperties.push(obj);
                         }
@@ -141,13 +138,13 @@ module.exports = (course, item, callback) => {
     function matchXMLPages(url, srcId) {
         var returnObj = {};
 
-        xmlArray.forEach((xml, i) => {
+        xmlArray.forEach((xml) => {
             if (srcId === xml.code) {
                 returnObj = {
                     'srcId': srcId,
                     'url': url,
                     'd2l': xml,
-                }
+                };
             }
         });
 
@@ -168,11 +165,11 @@ module.exports = (course, item, callback) => {
             'Assignment',
         ];
 
-        var isThingToNotTouch = (thingsToNotTouch.find((element) => {
+        var isThingToNotTouch = thingsToNotTouch.find((element) => {
             return link.d2l.page.includes(element);
-        }));
+        });
 
-        if (typeof isThingToNotTouch === "undefined") {
+        if (typeof isThingToNotTouch === 'undefined') {
             var page = canvasPagesArray.find((canvasPage) => {
                 return link.d2l.page.includes(canvasPage.name);
             });
@@ -197,7 +194,7 @@ module.exports = (course, item, callback) => {
 
         //go through each object in pageProperties and set up
         //obj to be fixed.
-        pageProperties.forEach((link, i) => {
+        pageProperties.forEach((link) => {
             var newUrl = getCanvasUrl(link);
 
             if (!newUrl) {
@@ -307,4 +304,4 @@ module.exports = (course, item, callback) => {
             buildCanvasArrayCallback(null);
         });
     }
-}
+};
