@@ -1,8 +1,16 @@
 const cheerio = require('cheerio');
 
-
-
 module.exports = (course, item, callback) => {
+    //only add the platforms your grandchild should run in
+    var validPlatforms = ['online', 'pathway', 'campus'];
+    var validPlatform = validPlatforms.includes(course.settings.platform);
+
+    /* If the item is marked for deletion or isn't a valid platform type, do nothing */
+    if (item.techops.delete === true || validPlatform !== true) {
+        callback(null, course, item);
+        return;
+    }
+    
     /* Array of all tags to be searched */
     var arrayOfTags = ['p', 'span', 'div'];
 
@@ -35,10 +43,8 @@ module.exports = (course, item, callback) => {
         callback(null, course, item);
     }
 
-    var validPlatforms = ['Campus', 'Online', 'Pathway'];
-
     /* If HTML exists in the current item, call the action */
-    if ((typeof item.techops.getHTML(item) != 'undefined' || item.techops.getHTML(item) != null && item.techops.delete === false) && validPlatforms.includes(course.settings.platform)) {
+    if (typeof item.techops.getHTML(item) != 'undefined' || item.techops.getHTML(item) != null) {
         action();
     } else {
         callback(null, course, item);

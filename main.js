@@ -18,7 +18,7 @@ var templates = [
 /* Universal item actions */
 var universal = [
     require('./actions/universal-styling-div.js'),
-    // require('./actions/universal-html-deprecated-tags.js'),
+    require('./actions/universal-html-deprecated-tags.js'),
     require('./actions/universal-rename.js'),
     require('./actions/universal-references.js'),
     require('./actions/universal-target-attributes.js'),
@@ -30,6 +30,7 @@ var universal = [
     require('./actions/universal-html-replace-tags.js'),
     // require('./actions/universal-description-quicklinks.js'),
     require('./actions/universal-html-empty-tags.js'),
+    require('./actions/universal-broken-links.js'),
 ];
 
 module.exports = (course, stepCallback) => {
