@@ -7,7 +7,9 @@ module.exports = (course, item, callback) => {
     //from overview pages.
     if (item.techops.delete === true ||
         item.techops.getHTML(item) === null ||
-        item.techops.getTitle(item).match(/overview/gi)) {
+        item.techops.getTitle(item).match(/overview/gi) ||
+        course.settings.platform === 'campus') {
+        
         callback(null, course, item);
         return;
     } else {
