@@ -329,7 +329,6 @@ module.exports = (course, item, callback) => {
                 }
 
                 if (assignments.length === 0) {
-                    console.log(`hi`);
                     course.warning('No assignments were found in the course.');
                     callback(null, course, item);
                 } else {
