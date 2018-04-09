@@ -6,11 +6,14 @@ var xmlAssignments = [];
 var canvasAssignments = [];
 
 module.exports = (course, item, callback) => {
+    var validPlatforms = [
+        'online',
+    ];
 
     //no need to check items that will be deleted
     if (item.techops.delete === true ||
         item.techops.getHTML(item) === null ||
-        course.settings.platform === 'campus') {
+        !validPlatforms.includes(course.settings.platform)) {
         callback(null, course, item);
         return;
     }
