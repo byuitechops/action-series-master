@@ -322,7 +322,21 @@ module.exports = (course, item, callback) => {
 
             constructXMLAssigmentsCallback(null);
         } else {
-            constructXMLAssigmentsCallback(new Error('dropbox_d2l.xml not found'));
+            canvas.getAssignments(course.info.canvasOU, (getAssignmentsErr, assignments) => {
+                if (getAssignmentsErr) {
+                    constructXMLAssigmentsCallback(getAssignmentsErr);
+                    return;
+                }
+
+                if (assignments.length === 0) {
+                    console.log(`hi`);
+                    course.warning('No assignments were found in the course.');
+                    callback(null, course, item);
+                } else {
+                    course.error('Dropboxes exist in the course but there is no dropbox_d2l.xml file to work with.');
+                    constructXMLAssigmentsCallback(null);
+                }
+            });
         }
     }
 };
