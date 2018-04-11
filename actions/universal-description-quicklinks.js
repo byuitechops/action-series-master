@@ -103,8 +103,7 @@ module.exports = (course, item, callback) => {
         } else {
             //checking to see if a link meetings the criteria
             $(links).each((i, link) => {
-                if ($(link).attr('href') !== undefined &&
-                    $(link).attr('href') !== null) {
+                if ($(link).attr('href')) {
                 
                     if ($(link).attr('href').includes(check)) {
                         pageLink = true;
