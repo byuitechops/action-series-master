@@ -98,7 +98,6 @@ module.exports = (course, item, callback) => {
 
             //one or more links meets the criteria. let's move to fix the links
             if (pageLink) {
-                console.log(item.techops.getTitle(item));
                 $(links).each((i, link) => {
                     var url = $(link).attr('href');
 
@@ -137,9 +136,7 @@ module.exports = (course, item, callback) => {
     function matchXMLPages(url, srcId) {
         var returnObj = {};
 
-        console.log(xmlArray.length);
         xmlArray.forEach((xml) => {
-            console.log(`srcId: ${srcId}. xml: ${xml.code}`);
             if (srcId === xml.code) {
                 returnObj = {
                     'srcId': srcId,
