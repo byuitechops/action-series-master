@@ -1,3 +1,11 @@
+/********************************************************
+ * Grandchild Description - remove-banners
+ * 
+ * This grandchild checks to see if the item is an Overview
+ * page. If it is not, it moves on; otherwise, it will go
+ * ahead and remove the course banner from the page.
+ ********************************************************/
+
 const cheerio = require('cheerio');
 
 module.exports = (course, item, callback) => {
