@@ -27,17 +27,12 @@ module.exports = (course, item, callback) => {
             return;
         }
 
+        // There is currently a problem if there are multiple tags in the same document, it will only delete the first one.
         // Replace the specified element with the contents of the element removing the tag
         // Canvas automatically places a `<p>` tag at the before the img when there is no other tag before
-
-        // No problems if only one or two tags.
-        // ****************Only deletes one tag when there are multiple tags********************
-
         for (let i = 0; i < elementsToKill.length; i++) {
             $(`#${elementsToKill[i]}`).replaceWith($(`#${elementsToKill[i]}`).contents());
         }
-
-        // console.log($.html());
 
         // Set the new HTML on the object
         item.techops.setHTML(item, $.html());
