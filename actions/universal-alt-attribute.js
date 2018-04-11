@@ -1,3 +1,7 @@
+/*********************************************************************************************
+ * Universal Alt Attribute
+ * Description: Reports the images that have no alt attribute or whose alt attribute is empty
+ *********************************************************************************************/
 const cheerio = require('cheerio');
 
 module.exports = (course, item, callback) => {

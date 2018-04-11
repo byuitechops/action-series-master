@@ -1,3 +1,9 @@
+/****************************************************************************
+ * Universal Broken Quicklinks
+ * Description: In D2L there are internal links that have 'quickLink' in the
+ * URI which when converted to Canvas, break. This Grandchild Module logs 
+ * these broken links so that we can have a report with all of these links
+ ****************************************************************************/
 const cheerio = require('cheerio');
 
 module.exports = (course, item, callback) => {
