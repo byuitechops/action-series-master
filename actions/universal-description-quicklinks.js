@@ -1,3 +1,15 @@
+/********************************
+ * Grandchild Description
+ * 
+ * This grandchild goes through 
+ * the item that is passed in and 
+ * checks to see if all of the 
+ * quicklinks work. If a quicklink
+ * does not work, it will also go
+ * ahead and make the fix on the 
+ * quicklink.
+ ********************************/
+
 const canvas = require('canvas-wrapper');
 const cheerio = require('cheerio');
 
