@@ -252,7 +252,7 @@ module.exports = (course, item, callback) => {
             var newUrl = getCanvasUrl(link);
 
             //the Canvas Dropbox does not exist in the course
-            if (newUrl === null || newUrl === undefined) {
+            if (!newUrl) {
                 course.warning('You may want to investigate this course a little bit more since a dropbox is missing.');
                 return;
             } 
