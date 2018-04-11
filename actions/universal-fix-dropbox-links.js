@@ -1,3 +1,15 @@
+/**************************************************
+ * Grandchild description
+ * 
+ * This module is a replicate of the child module
+ * titled, 'repair-quicklinks'. It simply parses the
+ * item passed in and checks to see if any dropbox
+ * quicklinks exist since all dropbox quicklinks
+ * break during import. This will also make the fix
+ * if it finds a dropbox quicklink (even if there
+ * are multiple occurrences on the same page).
+ **************************************************/
+
 const asyncLib = require('async');
 const cheerio = require('cheerio');
 const canvas = require('canvas-wrapper');
