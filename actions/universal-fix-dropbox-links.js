@@ -332,17 +332,20 @@ module.exports = (course, item, callback) => {
 
             constructXMLAssigmentsCallback(null);
         } else {
+            // If there are no dropbox xml files why do we even bother to check the assignments?
             canvas.getAssignments(course.info.canvasOU, (getAssignmentsErr, assignments) => {
                 if (getAssignmentsErr) {
                     constructXMLAssigmentsCallback(getAssignmentsErr);
                     return;
                 }
-
+                
                 if (assignments.length === 0) {
                     course.warning('No assignments were found in the course.');
+                    // is this supposed to be callback, or constructXMLAssigmentsCallback?
                     callback(null, course, item);
                 } else {
-                    course.error(new Error('Dropboxes exist in the course but there is no dropbox_d2l.xml file to work with.'));
+                    // We just don't care to throw a warning. Also, this error triggers multiple times for the same reason
+                    /* course.error(new Error('Dropboxes exist in the course but there is no dropbox_d2l.xml file to work with.')); */
                     constructXMLAssigmentsCallback(null);
                 }
             });
