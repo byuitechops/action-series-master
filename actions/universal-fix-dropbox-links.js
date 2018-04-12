@@ -1,3 +1,15 @@
+/**************************************************
+ * Grandchild description
+ * 
+ * This module is a replicate of the child module
+ * titled, 'repair-quicklinks'. It simply parses the
+ * item passed in and checks to see if any dropbox
+ * quicklinks exist since all dropbox quicklinks
+ * break during import. This will also make the fix
+ * if it finds a dropbox quicklink (even if there
+ * are multiple occurrences on the same page).
+ **************************************************/
+
 const asyncLib = require('async');
 const cheerio = require('cheerio');
 const canvas = require('canvas-wrapper');
@@ -6,15 +18,12 @@ var xmlAssignments = [];
 var canvasAssignments = [];
 
 module.exports = (course, item, callback) => {
-    var validPlatforms = [
-        'online'
-    ];
+    //only add the platforms your grandchild should run in
+    var validPlatforms = ['online', 'pathway', 'campus'];  
+    var validPlatform = validPlatforms.includes(course.settings.platform);
 
     //no need to check items that will be deleted
-    if (item.techops.delete === true ||
-        item.techops.getHTML(item) === null ||
-        !validPlatforms.includes(course.settings.platform)) {
-        
+    if (item.techops.delete === true || item.techops.getHTML(item) === null || validPlatform !== true) {
         callback(null, course, item);
         return;
     }
@@ -241,7 +250,7 @@ module.exports = (course, item, callback) => {
             var newUrl = getCanvasUrl(link);
 
             //the Canvas Dropbox does not exist in the course
-            if (newUrl === null || newUrl === undefined) {
+            if (!newUrl) {
                 course.warning('You may want to investigate this course a little bit more since a dropbox is missing.');
                 return;
             } 
@@ -323,7 +332,20 @@ module.exports = (course, item, callback) => {
 
             constructXMLAssigmentsCallback(null);
         } else {
-            constructXMLAssigmentsCallback(new Error('dropbox_d2l.xml not found'));
+            canvas.getAssignments(course.info.canvasOU, (getAssignmentsErr, assignments) => {
+                if (getAssignmentsErr) {
+                    constructXMLAssigmentsCallback(getAssignmentsErr);
+                    return;
+                }
+
+                if (assignments.length === 0) {
+                    course.warning('No assignments were found in the course.');
+                    callback(null, course, item);
+                } else {
+                    course.error('Dropboxes exist in the course but there is no dropbox_d2l.xml file to work with.');
+                    constructXMLAssigmentsCallback(null);
+                }
+            });
         }
     }
 };

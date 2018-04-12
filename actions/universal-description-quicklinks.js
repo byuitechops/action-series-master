@@ -19,15 +19,18 @@ var xmlArray = [];
 var canvasPagesArray = [];
 
 module.exports = (course, item, callback) => {
+    var validPlatforms = ['online', 'pathway', 'campus'];
+    var validPlatform = validPlatforms.includes(course.settings.platform);
+    
     var pageLink = false;
     var validPlatforms = [
         'online'
     ];
 
     if (item.techops.delete === true ||
-        item.techops.getHTML(item) === null ||
-        !validPlatforms.includes(course.settings.platform)) {
-        
+        item.techops.getHTML(item) === null || 
+        validPlatform !== true) {
+
         callback(null, course, item);
         return;
     } else {
@@ -40,7 +43,7 @@ module.exports = (course, item, callback) => {
      * This function begins the process and ensures that the arrays
      * are correctly populated before moving ahead with the quicklink
      * fixes.
-    ******************************************************************/
+     ******************************************************************/
     function beginProcess() {
         checkArrays((checkArraysErr) => {
             if (checkArraysErr) {
@@ -59,7 +62,7 @@ module.exports = (course, item, callback) => {
      * @param checkArraysCallback - callback
      *  
      * This function ensures that the arrays are correctly populated.
-    ******************************************************************/
+     ******************************************************************/
     function checkArrays(checkArraysCallback) {
         if (xmlArray.length < 1) {
             buildXMLArray((err) => {
@@ -90,7 +93,7 @@ module.exports = (course, item, callback) => {
      * This function goes through the page and checks to see if there 
      * are any links. If links do exist, does the link contain 
      * CANVAS_COURSE_REFERENCE? If it does, the link is broken.
-    ******************************************************************/
+     ******************************************************************/
     function checkPages() {
         var pageProperties = [];
 
@@ -131,7 +134,7 @@ module.exports = (course, item, callback) => {
                 });
 
                 //we have finished getting all of the properties we need to fix the link
-                getCorrectLinks(pageProperties);    
+                getCorrectLinks(pageProperties);
             }
         }
 
@@ -147,7 +150,7 @@ module.exports = (course, item, callback) => {
      * This function goes through the XML array and matches the srcId
      * with each XML code. If it matches, we have found the correct
      * page so we just build an object of stuff we need and return it.
-    ******************************************************************/
+     ******************************************************************/
     function matchXMLPages(url, srcId) {
         var returnObj = {};
 
@@ -172,7 +175,7 @@ module.exports = (course, item, callback) => {
      * This function acts as a driver for obtaining the correct link
      * for the page then creating an object to be added to the array 
      * of broken links. 
-    ******************************************************************/
+     ******************************************************************/
     function getCorrectLinks(pageProperties) {
         var brokenLinks = [];
 
@@ -180,11 +183,8 @@ module.exports = (course, item, callback) => {
         //obj to be fixed.
         pageProperties.forEach((link) => {
             var newUrl = getCanvasUrl(link);
-
-            if (newUrl === '' ||
-                newUrl === undefined ||
-                newUrl === null) {
-                
+          
+            if (!newUrl) {
                 course.error(`You may want to look into this course. ${link.d2l.page} appears to be missing from the course.`);
                 return;
             }
@@ -234,7 +234,7 @@ module.exports = (course, item, callback) => {
      * link with the new, working link. After replacement, a log is then
      * added for report tracking. Once this has been completed, the HTML
      * is then set for replacement so it can be uploaded to Canvas.
-    ******************************************************************/
+     ******************************************************************/
     function repairLinks(brokenLinks) {
         var title = item.techops.getTitle(item);
         var logName = 'Broken Description Quicklinks';
@@ -268,7 +268,7 @@ module.exports = (course, item, callback) => {
      * 
      * This function goes through and builds the XML array with the 
      * stuff that we need for the grandchild.
-    ******************************************************************/
+     ******************************************************************/
     function buildXMLArray(buildXMLArrayCallback) {
         //find file location
         var file = course.content.find(file => file.name === 'imsmanifest.xml');
@@ -298,7 +298,7 @@ module.exports = (course, item, callback) => {
      * 
      * This function goes through and builds the Canvas array with the 
      * stuff that we need for the grandchild.
-    ******************************************************************/
+     ******************************************************************/
     function buildCanvasArray(buildCanvasArrayCallback) {
         canvas.get(`/api/v1/courses/${course.info.canvasOU}/pages`, (getErr, pages) => {
             if (getErr) {
