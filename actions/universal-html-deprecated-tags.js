@@ -15,14 +15,10 @@ module.exports = (course, item, callback) => {
         var elements = {};
 
         // Check if any exist
-        var none = true;
-        elementsToKill.forEach(el => {
-            elements[el] = $(`#${el}`);
-            if ($(elements[el]).length !== 0) none = false;
-        });
+        var none = (elementsToKill.some(el => elements[el] = $(`#${el}`)));
 
         // Return if they're all empty
-        if (none === true) {
+        if (none !== true) {
             callback(null, course, item);
             return;
         }
