@@ -1,6 +1,21 @@
+/****************************************************************************
+ * Universal Broken Quicklinks
+ * Description: In D2L there are internal links that have 'quickLink' in the
+ * URI which when converted to Canvas, break. This Grandchild Module logs 
+ * these broken links so that we can have a report with all of these links
+ ****************************************************************************/
 const cheerio = require('cheerio');
 
 module.exports = (course, item, callback) => {
+    //only add the platforms your grandchild should run in
+    var validPlatforms = ['online', 'pathway', 'campus'];
+    var validPlatform = validPlatforms.includes(course.settings.platform);
+
+    /* If the item is marked for deletion or isn't a valid platform type, do nothing */
+    if (item.techops.delete === true || validPlatform !== true) {
+        callback(null, course, item);
+        return;
+    }
 
     /* This is the action that happens if the test is passed */
     function action() {
@@ -25,16 +40,10 @@ module.exports = (course, item, callback) => {
                 }
             });
         }
-        
+
         /* Next item or grandchild module */
         callback(null, course, item);
     }
 
-    /* If the item is marked for deletion, do nothing */
-    if (item.techops.delete === true) {
-        callback(null, course, item);
-        return;
-    } else {
-        action();
-    }
+    action();
 };

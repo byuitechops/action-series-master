@@ -17,19 +17,20 @@ var templates = [
 
 /* Universal item actions */
 var universal = [
-    // require('./actions/universal-styling-div.js'),
+    require('./actions/universal-styling-div.js'),
     require('./actions/universal-html-deprecated-tags.js'),
-    // require('./actions/universal-rename.js'),
-    // require('./actions/universal-references.js'),
-    // require('./actions/universal-target-attributes.js'),
-    // require('./actions/universal-alt-attribute.js'),
-    // require('./actions/universal-set-external-links.js'),
-    // require('./actions/universal-err-links.js'),
-    // require('./actions/universal-remove-banners.js'),
-    // require('./actions/universal-fix-dropbox-links.js'),
-    // require('./actions/universal-html-replace-tags.js'),
-    // require('./actions/universal-description-quicklinks.js'),
-    // require('./actions/universal-html-empty-tags.js'),
+    require('./actions/universal-rename.js'),
+    require('./actions/universal-references.js'),
+    require('./actions/universal-target-attributes.js'),
+    require('./actions/universal-alt-attribute.js'),
+    require('./actions/universal-set-external-links.js'),
+    require('./actions/universal-err-links.js'),
+    require('./actions/universal-remove-banners.js'),
+    require('./actions/universal-fix-dropbox-links.js'),
+    require('./actions/universal-html-replace-tags.js'),
+    require('./actions/universal-description-quicklinks.js'),
+    require('./actions/universal-html-empty-tags.js'),
+    require('./actions/universal-broken-quicklinks.js'),
 ];
 
 module.exports = (course, stepCallback) => {

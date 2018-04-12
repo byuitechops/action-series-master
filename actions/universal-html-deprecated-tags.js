@@ -1,7 +1,16 @@
 const cheerio = require('cheerio');
 
 module.exports = (course, item, callback) => {
+    //only add the platforms your grandchild should run in
+    var validPlatforms = ['online', 'pathway'];
+    var validPlatform = validPlatforms.includes(course.settings.platform);
 
+    /* If the item is marked for deletion or isn't a valid platform type, do nothing */
+    if (item.techops.delete === true || validPlatform !== true) {
+        callback(null, course, item);
+        return;
+    }
+    
     var elementsToKill = [
         'main',
         'header',
@@ -43,8 +52,7 @@ module.exports = (course, item, callback) => {
     }
 
     /* If the item is marked for deletion, has no HTML to work with, or is the front page for the course, do nothing */
-    if (item.techops.delete === true ||
-        item.techops.getHTML(item) === null ||
+    if (item.techops.getHTML(item) === null ||
         item.techops.type === 'Page' && item.front_page === true) {
         callback(null, course, item);
     } else {

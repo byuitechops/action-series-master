@@ -1,6 +1,16 @@
 const cheerio = require('cheerio');
 
 module.exports = (course, item, callback) => {
+    //only add the platforms your grandchild should run in
+    var validPlatforms = ['online', 'pathway', 'campus'];
+    var validPlatform = validPlatforms.includes(course.settings.platform);
+
+    /* If the item is marked for deletion or isn't a valid platform type, do nothing */
+    if (item.techops.delete === true || validPlatform !== true) {
+        callback(null, course, item);
+        return;
+    }
+    
     /* Array of all tags to be searched */
     var arrayOfTags = ['p', 'span', 'div'];
 
@@ -14,13 +24,13 @@ module.exports = (course, item, callback) => {
 
         /* Filters to the html tags with no attributes nad no text */
         function toNoTextNoAttr(i, ele) {
-            return (Object.keys(ele.attribs).length === 0 && $(ele).text() === '');
+            return Object.keys(ele.attribs).length === 0 && $(ele).text() === '';
         }
 
         /* Create cheerio object and search them with FUNCTION and remove those*/
         arrayOfTags.forEach(function (element) {
             $(element).filter(toNoTextNoAttr).remove();
-        })
+        });
 
         /* Set the HTML to exclude the deleted parts */
         item.techops.setHTML(item, $.html());

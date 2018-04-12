@@ -1,5 +1,13 @@
+/****************************************************************************
+ * Universal Naming Conventions
+ * Description: The purpose of this module is to standardize each item title
+ * to match the format 'Wxx _ActivityType_: Activity Name'. Some items have
+ * special naming conventions and others don't need to be standardized at all
+ * (i.e. Items in the Instructor Resources or Student Resources modules).
+ * This module will work to rename each item title, except for module titles
+ * which are taken care of in modules-naming-conventions
+ ****************************************************************************/
 module.exports = (course, item, callback) => {
-
     /************************************************************************************
      * Find the week number for each module item from its parent module's title. If the 
      * week number is only one digit long, append a zero to the beginning of the number.
