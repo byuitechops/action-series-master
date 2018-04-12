@@ -1,6 +1,21 @@
+/****************************************************************************
+ * Universal Target Attributes
+ * Description: The purpose of this module is to help each external link open
+ * in a new tab. This can be done by searching for 'byui.instructure' in the
+ * URI and setting the target attribute to '_blank' for these links
+ ****************************************************************************/
 const cheerio = require('cheerio');
 
 module.exports = (course, item, callback) => {
+    /* Only add the platforms your grandchild should run in */
+    var validPlatforms = ['online', 'pathway', 'campus'];
+    var validPlatform = validPlatforms.includes(course.settings.platform);
+
+    /* If the item is marked for deletion or isn't a valid platform type, do nothing */
+    if (item.techops.delete === true || validPlatform !== true) {
+        callback(null, course, item);
+        return;
+    }
 
     /* This is the action that happens if the test is passed */
     function action() {
@@ -43,7 +58,7 @@ module.exports = (course, item, callback) => {
     }
 
     /* If the item is marked for deletion, do nothing */
-    if (item.techops.delete === true || item.techops.getHTML(item) === null) {
+    if (item.techops.getHTML(item) === null) {
         callback(null, course, item);
         return;
     } else {

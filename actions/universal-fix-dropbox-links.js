@@ -18,14 +18,14 @@ var xmlAssignments = [];
 var canvasAssignments = [];
 
 module.exports = (course, item, callback) => {
-    var validPlatforms = [
-        'online',
-    ];
+    //only add the platforms your grandchild should run in
+    var validPlatforms = ['online', 'pathway', 'campus'];  
+    var validPlatform = validPlatforms.includes(course.settings.platform);
+
+    var itemDropboxLink = false;
 
     //no need to check items that will be deleted
-    if (item.techops.delete === true ||
-        item.techops.getHTML(item) === null ||
-        !validPlatforms.includes(course.settings.platform)) {
+    if (item.techops.delete === true || item.techops.getHTML(item) === null || validPlatform !== true) {
         callback(null, course, item);
         return;
     }
