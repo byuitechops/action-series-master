@@ -1,13 +1,18 @@
 const cheerio = require('cheerio');
 
 module.exports = (course, item, callback) => {
+    //only add the platforms your grandchild should run in
+    var validPlatforms = ['online', 'pathway', 'campus'];
+    var validPlatform = validPlatforms.includes(course.settings.platform);
+
     //check to see if the item is set to be deleted. if it is,
     //we just need to move on. This also checks to see if the
     //page is an overview page. We are not to delete the banner
     //from overview pages.
     if (item.techops.delete === true ||
         item.techops.getHTML(item) === null ||
-        item.techops.getTitle(item).match(/overview/gi)) {
+        item.techops.getTitle(item).match(/overview/gi) ||
+        validPlatform !== true) {
         callback(null, course, item);
         return;
     } else {

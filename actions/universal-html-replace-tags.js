@@ -1,6 +1,21 @@
+/****************************************************************************
+ * Universal HTML Replace Tags
+ * Description: Some HTML tags in various parts of each course are old and/or
+ * deprecated. This Grandchild Module searches the HTML of each item and if
+ * an old tag is found, it will be replaced by a newer version of the tag
+ ****************************************************************************/
 const cheerio = require('cheerio');
 
 module.exports = (course, item, callback) => {
+    //only add the platforms your grandchild should run in
+    var validPlatforms = ['online', 'pathway', 'campus'];
+    var validPlatform = validPlatforms.includes(course.settings.platform);
+
+    /* If the item is marked for deletion or isn't a valid platform type, do nothing */
+    if (item.techops.delete === true || validPlatform !== true) {
+        callback(null, course, item);
+        return;
+    }
 
     /* Pages to be renamed, in LOWER case */
     var tagsToReplace = [{
@@ -45,7 +60,7 @@ module.exports = (course, item, callback) => {
         callback(null, course, item);
     }
 
-    if (found != undefined) {
+    if (found !== undefined) {
         action();
     } else {
         callback(null, course, item);
