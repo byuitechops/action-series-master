@@ -15,6 +15,7 @@ module.exports = (course, item, callback) => {
     if (item.techops.delete === true ||
         item.techops.getHTML(item) === null || 
         validPlatform !== true) {
+
         callback(null, course, item);
         return;
     } else {
@@ -90,10 +91,10 @@ module.exports = (course, item, callback) => {
         } else {
             //checking to see if a link meetings the criteria
             $(links).each((i, link) => {
-                if (typeof $(link).attr('href') != 'undefined' &&
-                    $(link).attr('href') != null) {
-
-                    if ($(link).attr('href').indexOf(check) != -1) {
+                if ($(link).attr('href') !== undefined &&
+                    $(link).attr('href') !== null) {
+                
+                    if ($(link).attr('href').includes(check)) {
                         pageLink = true;
                     }
                 }
@@ -110,7 +111,8 @@ module.exports = (course, item, callback) => {
 
                         //check to see if obj is empty object
                         if (Object.keys(obj).length === 0) {
-                            throw new Error('Hmm, there is a problem with the course. An assignment never existed in Brightspace but is trying to exist in Canvas somehow.');
+                            course.warning('Hmm, there is a problem with the course. An assignment never existed in Brightspace but is trying to exist in Canvas somehow.');
+                            return;
                         } else {
                             pageProperties.push(obj);
                         }
@@ -169,7 +171,7 @@ module.exports = (course, item, callback) => {
             return link.d2l.page.includes(element);
         });
 
-        if (typeof isThingToNotTouch === 'undefined') {
+        if (isThingToNotTouch === undefined) {
             var page = canvasPagesArray.find((canvasPage) => {
                 return link.d2l.page.includes(canvasPage.name);
             });
@@ -201,9 +203,7 @@ module.exports = (course, item, callback) => {
                 return;
             }
 
-            if (newUrl === '' ||
-                typeof newUrl === 'undefined') {
-
+            if (newUrl === '' || newUrl === undefined) {
                 course.error(`You may want to look into this course. ${link.d2l.page} appears to be missing from the course.`);
                 return;
             }
@@ -243,7 +243,7 @@ module.exports = (course, item, callback) => {
             });
 
             //for report tracking
-            course.log(logName, {
+            item.techops.log(logName, {
                 'badLink': item.badLink,
                 'newLink': item.newLink,
                 'page': title,
@@ -270,16 +270,19 @@ module.exports = (course, item, callback) => {
         });
 
         //error handling
-        if (typeof file === 'undefined') {
+        if (file === undefined) {
             buildXMLArrayCallback(new Error('imsmanifest.xml not found'));
             return;
         }
 
         var $ = file.dom;
 
-        console.log($('item item title').map((i, element) => {
-            return $(element).text();
-        }).get());
+        $('item item').each((index, element) => {
+            xmlArray.push({
+                'page': $(element).children('title').text(),
+                'code': element.attribs.identifier
+            });
+        });
 
         buildXMLArrayCallback(null);
     }
