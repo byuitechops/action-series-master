@@ -28,11 +28,17 @@ module.exports = (course, item, callback) => {
         if (links.length !== 0) {
             var oldTarget = '';
             links.forEach(link => {
+                /* An array of each character in the href */
+                var eachChar = $(link).attr('href').split('');
+
                 if ($(link).attr('target')) {
                     oldTarget = $(link).attr('target');
                 }
-                /* Link is external if it does not include 'byui.instructure' in the href attribute */
-                if ($(link).attr('href') && !$(link).attr('href').includes('byui.instructure')) {
+                /* Link is external if it does not include 'byui.instructure' in the href attribute, 
+                and it isn't a stand alone #id, and it isn't a uri (ex. /modules/23213/item/12339) 
+                and it's uri doesn't start with '%' which would likely mean it is a broken link that
+                is fixed in another grandchild module */
+                if ($(link).attr('href') && !$(link).attr('href').includes('byui.instructure') && eachChar[0] !== '#' && eachChar[0] !== '/'&& eachChar[0] !== '%') {
                     /* If their is no 'target' attribute, or it is set to anything but '_blank'... */
                     if ($(link).attr('target') !== '_blank') {
                         /* Set new target to _blank */
