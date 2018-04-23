@@ -47,7 +47,7 @@ module.exports = (course, item, callback) => {
     function beginProcess() {
         checkArrays((checkArraysErr) => {
             if (checkArraysErr) {
-                course.err(checkArraysErr);
+                course.error(checkArraysErr);
                 callback(null, course, item);
             }
 

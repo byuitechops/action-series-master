@@ -18,16 +18,16 @@ var xmlAssignments = [];
 var canvasAssignments = [];
 
 module.exports = (course, item, callback) => {
-    //only add the platforms your grandchild should run in
-    var validPlatforms = ['online', 'pathway', 'campus'];  
+    // only add the platforms your grandchild should run in
+    var validPlatforms = ['online', 'pathway', 'campus'];
     var validPlatform = validPlatforms.includes(course.settings.platform);
 
-    //no need to check items that will be deleted
+    // no need to check items that will be deleted
     if (item.techops.delete === true || item.techops.getHTML(item) === null || validPlatform !== true) {
         callback(null, course, item);
         return;
     }
-     
+
     beginProcess();
 
     /****************************************************************
@@ -37,9 +37,9 @@ module.exports = (course, item, callback) => {
      * all of the functions and makes sure that they are completed.
     ******************************************************************/
     function beginProcess() {
-        //ensure that the arrays are correctly populated before
-        //starting the repairLinks grandchild.
-        //checkArrays is done in async.
+        // ensure that the arrays are correctly populated before
+        // starting the repairLinks grandchild.
+        // checkArrays is done in async.
         checkArrays((err) => {
             if (err) {
                 course.error(err);
@@ -61,15 +61,15 @@ module.exports = (course, item, callback) => {
      * and ensure that everything has been set up correctly so the program
      * doesn't have to parse the XML or make API calls 9000 times for the 
      * entire grandchild module to run. 
-    ******************************************************************/
+     ******************************************************************/
     function checkArrays(checkArraysCallback) {
         var functions = [
             buildXMLArray,
             buildCanvasArray
         ];
 
-        //waterfall through the functions to help ensure that the 
-        //arrays are actually completed.     
+        // waterfall through the functions to help ensure that the 
+        // arrays are actually completed.     
         asyncLib.waterfall(functions, (waterfallErr) => {
             if (waterfallErr) {
                 checkArraysCallback(waterfallErr);
@@ -88,7 +88,7 @@ module.exports = (course, item, callback) => {
      * This function needs to happen before everything. This goes through
      * and ensure that the XML array has been set up correctly so the program
      * doesn't have to parse the XML 9000 times.
-    ******************************************************************/
+     ******************************************************************/
     function buildXMLArray(buildXMLArrayCallback) {
         if (xmlAssignments.length < 1) {
             constructXMLAssignments((err) => {
@@ -112,7 +112,7 @@ module.exports = (course, item, callback) => {
      * This function needs to happen before everything. This goes through
      * and ensure that the canvas array has been set up correctly so the 
      * program doesn't have to make API calls 9000 times.
-    ******************************************************************/
+     ******************************************************************/
     function buildCanvasArray(buildCanvasArrayCallback) {
         if (canvasAssignments.length < 1) {
             constructCanvasAssignments((err) => {
@@ -137,14 +137,14 @@ module.exports = (course, item, callback) => {
      * is already empty so we make an API call to retrieve an array 
      * of all the assignments in the course. This helps reduce the need
      * for API calls down to 1 for this entire grandchild.
-    ******************************************************************/
+     ******************************************************************/
     function constructCanvasAssignments(constructCanvasAssignmentsCallback) {
         canvas.get(`/api/v1/courses/${course.info.canvasOU}/assignments`, (getErr, assignments) => {
             if (getErr) {
                 constructCanvasAssignmentsCallback(getErr);
                 return;
             }
-            
+
             // move the contents from the assignments to canvasAssignments array
             canvasAssignments = [...assignments];
 
@@ -159,18 +159,18 @@ module.exports = (course, item, callback) => {
      * function utilizes cheerio to grab all of the links and analyze
      * each link. If there are no links or dropbox links, this function
      * will cause the grandchild to exit early to move on. 
-    ******************************************************************/
+     ******************************************************************/
     function parseItem() {
         var itemPropertiesArray = [];
 
-        //begin parsing the page through the getHTML properties
+        // begin parsing the page through the getHTML properties
         var $ = cheerio.load(item.techops.getHTML(item));
         var links = $('a');
 
-        //no links are found on the page so return!
+        // no links are found on the page so return!
         if (links.length === 0) {
             return;
-            //links are found. let's check each to see if they are dropbox links
+            // links are found. let's check each to see if they are dropbox links
         } else {
             var arr = $(links).filter((i, link) => $(link).attr('href').includes('drop_box'));
 
@@ -182,7 +182,7 @@ module.exports = (course, item, callback) => {
                     itemPropertiesArray.push(...matchXMLAssignments(url, srcId));
                 });
 
-                //pass array in to get correct Canvas dropbox
+                // pass array in to get correct Canvas dropbox
                 getCorrectLinks(itemPropertiesArray);
             }
         }
@@ -201,7 +201,7 @@ module.exports = (course, item, callback) => {
      * properties and build an obj out of it. This object is needed to 
      * be able to access the element of XMLAssignments for the api call
      * in getCorrectLinks()
-    ******************************************************************/
+     ******************************************************************/
     function matchXMLAssignments(url, srcId) {
         var itemProperties = [];
 
@@ -217,7 +217,7 @@ module.exports = (course, item, callback) => {
             }
         });
 
-        //return the array to be utilized to find the correct Canvas dropbox
+        // return the array to be utilized to find the correct Canvas dropbox
         return itemProperties;
     }
 
@@ -228,9 +228,9 @@ module.exports = (course, item, callback) => {
      * 
      * This function makes an API call to the assignments to obtain the
      * correct url for the dropbox.
-    ******************************************************************/
+     ******************************************************************/
     function getCanvasUrl(link) {
-    //find the Canvas assignment that we are looking for.
+        //find the Canvas assignment that we are looking for.
         return canvasAssignments.find(canvasAssignment => canvasAssignment.name === link.d2l.name);
     }
 
@@ -241,21 +241,21 @@ module.exports = (course, item, callback) => {
      * 
      * This function makes an API call to the assignments to obtain the
      * correct url for the dropbox.
-    ******************************************************************/
+     ******************************************************************/
     function getCorrectLinks(itemPropertiesArray) {
         var brokenLinks = [];
 
         itemPropertiesArray.forEach((link) => {
-            //retrieve correct Dropbox link
+            // retrieve correct Dropbox link
             var newUrl = getCanvasUrl(link);
 
-            //the Canvas Dropbox does not exist in the course
+            // the Canvas Dropbox does not exist in the course
             if (!newUrl) {
                 course.warning('You may want to investigate this course a little bit more since a dropbox is missing.');
                 return;
-            } 
+            }
 
-            //build object and add to array to help repairLinks have an easier time
+            // build object and add to array to help repairLinks have an easier time
             brokenLinks.push({
                 'badLink': link.url,
                 'newLink': newUrl.html_url
@@ -274,23 +274,23 @@ module.exports = (course, item, callback) => {
      *  
      * This function goes through and fixes all of the dropbox links
      * inside brokenLinks array.
-    ******************************************************************/
+     ******************************************************************/
     function repairLinks(brokenLinks) {
         var title = item.techops.getTitle(item);
         var logName = 'Fixed Broken Dropbox Links';
         var $ = cheerio.load(item.techops.getHTML(item));
         var links = $('a');
 
-        //this forEach actually goes through each link and replaces the 
-        //bad link with the proper link. In addition, the way this is 
-        //set up, it'll fix all of the occurrences of the same link
-        //if needed.
+        // this forEach actually goes through each link and replaces the 
+        // bad link with the proper link. In addition, the way this is 
+        // set up, it'll fix all of the occurrences of the same link
+        // if needed.
         brokenLinks.forEach((element) => {
             links.attr('href', (index, link) => {
                 return link.replace(element.badLink, element.newLink);
             });
 
-            //log to make life easier for everyone
+            // log to make life easier for everyone
             item.techops.log(logName, {
                 'Bad Link': element.badLink,
                 'New Link': element.newLink,
@@ -310,17 +310,17 @@ module.exports = (course, item, callback) => {
      * the dropbox information through a different function. This 
      * function then parses the xml file and stores all of the 
      * information in an array.
-    ******************************************************************/
+     ******************************************************************/
     function constructXMLAssignments(constructXMLAssigmentsCallback) {
-        //retrieve the dropbox_d2l.xml file
+        // retrieve the dropbox_d2l.xml file
         var dropbox = course.content.find(file => file.name === 'dropbox_d2l.xml');
 
         //checking to see if the dropbox xml really has been found
         if (dropbox !== undefined) {
             var $ = dropbox.dom;
 
-            //iterate through the xml nodes and retrieve the id and name 
-            //of each dropbox folder
+            // iterate through the xml nodes and retrieve the id and name 
+            // of each dropbox folder
             $('dropbox > folder').each((index, folder) => {
                 var obj = {
                     name: folder.attribs.name,
@@ -332,17 +332,20 @@ module.exports = (course, item, callback) => {
 
             constructXMLAssigmentsCallback(null);
         } else {
+            // If there are no dropbox xml files why do we even bother to check the assignments?
             canvas.getAssignments(course.info.canvasOU, (getAssignmentsErr, assignments) => {
                 if (getAssignmentsErr) {
                     constructXMLAssigmentsCallback(getAssignmentsErr);
                     return;
                 }
-
+                
                 if (assignments.length === 0) {
                     course.warning('No assignments were found in the course.');
+                    // is this supposed to be callback, or constructXMLAssigmentsCallback?
                     callback(null, course, item);
                 } else {
-                    course.error('Dropboxes exist in the course but there is no dropbox_d2l.xml file to work with.');
+                    // We just don't care to throw a warning. Also, this error triggers multiple times for the same reason
+                    /* course.error(new Error('Dropboxes exist in the course but there is no dropbox_d2l.xml file to work with.')); */
                     constructXMLAssigmentsCallback(null);
                 }
             });

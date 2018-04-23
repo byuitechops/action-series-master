@@ -60,7 +60,7 @@ module.exports = (course, item, callback) => {
         callback(null, course, item);
     }
 
-    if (found !== undefined) {
+    if (found !== undefined && item.techops.delete === false) {
         action();
     } else {
         callback(null, course, item);
