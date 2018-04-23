@@ -28,8 +28,9 @@ var universal = [
     require('./actions/universal-remove-banners.js'),
     require('./actions/universal-fix-dropbox-links.js'),
     require('./actions/universal-html-replace-tags.js'),
-    require('./actions/universal-description-quicklinks.js'),
+    // require('./actions/universal-description-quicklinks.js'),
     require('./actions/universal-html-empty-tags.js'),
+    require('./actions/universal-naming-conventions.js'),
     require('./actions/universal-broken-quicklinks.js'),
 ];
 
@@ -80,7 +81,7 @@ module.exports = (course, stepCallback) => {
                     }
 
                     /* Compare the original to the finalItem to see if we need to update it in Canvas */
-                    var diff = Object.keys(finalItem)
+                    let diff = Object.keys(finalItem)
                         .find(key => originalItem[key] !== finalItem[key] || finalItem.techops.delete === true);
 
                     if (diff) {
