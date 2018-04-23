@@ -1,3 +1,15 @@
+/********************************
+ * Grandchild Description
+ * 
+ * This grandchild goes through 
+ * the item that is passed in and 
+ * checks to see if all of the 
+ * quicklinks work. If a quicklink
+ * does not work, it will also go
+ * ahead and make the fix on the 
+ * quicklink.
+ ********************************/
+
 const canvas = require('canvas-wrapper');
 const cheerio = require('cheerio');
 
@@ -11,6 +23,9 @@ module.exports = (course, item, callback) => {
     var validPlatform = validPlatforms.includes(course.settings.platform);
     
     var pageLink = false;
+    var validPlatforms = [
+        'online'
+    ];
 
     if (item.techops.delete === true ||
         item.techops.getHTML(item) === null || 
@@ -91,8 +106,7 @@ module.exports = (course, item, callback) => {
         } else {
             //checking to see if a link meetings the criteria
             $(links).each((i, link) => {
-                if ($(link).attr('href') !== undefined &&
-                    $(link).attr('href') !== null) {
+                if ($(link).attr('href')) {
                 
                     if ($(link).attr('href').includes(check)) {
                         pageLink = true;
@@ -154,35 +168,6 @@ module.exports = (course, item, callback) => {
     }
 
     /****************************************************************
-     * getCanvasUrl()
-     * 
-     * @param link - pageProperties object
-     * 
-     * This function goes through the Canvas array and finds the 
-     * correct page and returns the link for that page.
-     ******************************************************************/
-    function getCanvasUrl(link) {
-        var thingsToNotTouch = [
-            'Dropbox',
-            'Assignment',
-        ];
-
-        var isThingToNotTouch = thingsToNotTouch.find((element) => {
-            return link.d2l.page.includes(element);
-        });
-
-        if (isThingToNotTouch === undefined) {
-            var page = canvasPagesArray.find((canvasPage) => {
-                return link.d2l.page.includes(canvasPage.name);
-            });
-
-            return page.html_url;
-        } else {
-            return null;
-        }
-    }
-
-    /****************************************************************
      * getCorrectLinks()
      * 
      * @param pageProperties - array of objects
@@ -198,24 +183,45 @@ module.exports = (course, item, callback) => {
         //obj to be fixed.
         pageProperties.forEach((link) => {
             var newUrl = getCanvasUrl(link);
-
+          
             if (!newUrl) {
-                return;
-            }
-
-            if (newUrl === '' || newUrl === undefined) {
                 course.error(`You may want to look into this course. ${link.d2l.page} appears to be missing from the course.`);
                 return;
             }
 
             brokenLinks.push({
                 'badLink': link.url,
-                'newLink': newUrl
+                'newLink': newUrl.html_url
             });
         });
 
         repairLinks(brokenLinks);
         return;
+    }
+
+    /****************************************************************
+     * getCanvasUrl()
+     * 
+     * @param link - pageProperties object
+     * 
+     * This function goes through the Canvas array and finds the 
+     * correct page and returns the link for that page.
+    ******************************************************************/
+   function getCanvasUrl(link) {
+        var thingsToNotTouch = [
+            'Dropbox',
+            'Assignment',
+        ];
+
+        var isThingToNotTouch = thingsToNotTouch.find(element => link.d2l.page.includes(element));
+
+        if (isThingToNotTouch === undefined) {
+            var page = canvasPagesArray.find(canvasPage => link.d2l.page.includes(canvasPage.title));
+
+            return page;
+        }
+        
+        return null;
     }
 
     /****************************************************************
@@ -231,21 +237,21 @@ module.exports = (course, item, callback) => {
      ******************************************************************/
     function repairLinks(brokenLinks) {
         var title = item.techops.getTitle(item);
-        var logName = 'Fixed Broken Description Quicklinks';
+        var logName = 'Broken Description Quicklinks';
         var $ = cheerio.load(item.techops.getHTML(item));
         var links = $('a');
 
         //this replaces ALL occurrences of the same link if
         //multiple links appear in the same page.
-        brokenLinks.forEach((item) => {
+        brokenLinks.forEach((element) => {
             links.attr('href', (i, link) => {
-                return link.replace(item.badLink, item.newLink);
+                return link.replace(element.badLink, element.newLink);
             });
 
             //for report tracking
-            item.techops.log(logName, {
-                'badLink': item.badLink,
-                'newLink': item.newLink,
+            course.log(logName, {
+                'badLink': element.badLink,
+                'newLink': element.newLink,
                 'page': title,
             });
         });
@@ -265,9 +271,7 @@ module.exports = (course, item, callback) => {
      ******************************************************************/
     function buildXMLArray(buildXMLArrayCallback) {
         //find file location
-        var file = course.content.find((file) => {
-            return file.name === 'imsmanifest.xml';
-        });
+        var file = course.content.find(file => file.name === 'imsmanifest.xml');
 
         //error handling
         if (file === undefined) {
