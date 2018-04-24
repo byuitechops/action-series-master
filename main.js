@@ -28,7 +28,7 @@ var universal = [
     require('./actions/universal-remove-banners.js'),
     require('./actions/universal-fix-dropbox-links.js'),
     require('./actions/universal-html-replace-tags.js'),
-    // require('./actions/universal-description-quicklinks.js'),
+    require('./actions/universal-description-quicklinks.js'),
     require('./actions/universal-html-empty-tags.js'),
     require('./actions/universal-naming-conventions.js'),
     require('./actions/universal-broken-quicklinks.js'),
