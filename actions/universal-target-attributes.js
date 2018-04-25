@@ -58,7 +58,8 @@ module.exports = (course, item, callback) => {
     }
 
     /* If the item is marked for deletion, do nothing */
-    if (item.techops.delete === true ||
+    if (course.settings.targetAttributes === false ||
+        item.techops.delete === true ||
         validPlatform !== true ||
         item.techops.getHTML(item) === null ||
         (item.techops.type === 'Page' && item.front_page === true)) {

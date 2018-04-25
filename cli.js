@@ -17,7 +17,7 @@ function buildHeader(course) {
 
 function getPristine() {
     return new Promise((resolve, reject) => {
-        canvas.get('/api/v1/accounts/1/courses?search_term=1 (Pristine)', (getErr, foundCourse) => {
+        canvas.get(`/api/v1/accounts/${course.settings.accountID}/courses?search_term=1 (Pristine)`, (getErr, foundCourse) => {
             if (getErr) return reject(getErr);
             if (foundCourse.length < 1) return reject(new Error('Cannot find Pristine Gauntlet.'));
             resolve(foundCourse[0]);
@@ -27,7 +27,7 @@ function getPristine() {
 
 function getUserCourse(courseID) {
     return new Promise((resolve, reject) => {
-        canvas.get(`/api/v1/accounts/1/courses/${courseID}`, (err, givenCourse) => {
+        canvas.get(`/api/v1/accounts/${course.settings.accountID}/courses/${courseID}`, (err, givenCourse) => {
             if (err) return reject(err);
             resolve(givenCourse[0]);
         });
@@ -56,7 +56,9 @@ function runActionSeries(foundCourse) {
 
 async function promptUser(foundCourse) {
     /* Register the question with the found gauntlet as the default */
-    enquirer.question('canvasID', 'Canvas Course ID:', { 'default': foundCourse.id });
+    enquirer.question('canvasID', 'Canvas Course ID:', {
+        'default': foundCourse.id
+    });
 
     /* Ask the user what course to run the action-series on */
     var answers = await enquirer.ask();
@@ -81,6 +83,3 @@ getPristine()
         courseObject.htmlReport('./reports', courseObject.info.courseName);
     })
     .catch(console.log);
-
-
-
