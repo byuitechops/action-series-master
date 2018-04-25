@@ -30,7 +30,7 @@
     "type": "git",
     "url": "git+https://github.com/byuitechops/action-series-master.git"
   },
-  "author": "Zachary Williams, Daniel Green",
+  "author": "Zachary Williams, Daniel Green, Seth Childers",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/byuitechops/action-series-master/issues"

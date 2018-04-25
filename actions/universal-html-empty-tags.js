@@ -44,7 +44,7 @@ module.exports = (course, item, callback) => {
     }
 
     /* If HTML exists in the current item, call the action */
-    if (typeof item.techops.getHTML(item) != 'undefined' || item.techops.getHTML(item) != null) {
+    if (item.techops.getHTML(item) !== undefined && item.techops.delete === false) {
         action();
     } else {
         callback(null, course, item);

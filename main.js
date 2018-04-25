@@ -80,7 +80,7 @@ module.exports = (course, stepCallback) => {
                     }
 
                     /* Compare the original to the finalItem to see if we need to update it in Canvas */
-                    var diff = Object.keys(finalItem)
+                    let diff = Object.keys(finalItem)
                         .find(key => originalItem[key] !== finalItem[key] || finalItem.techops.delete === true);
 
                     if (diff) {

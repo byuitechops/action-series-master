@@ -24,19 +24,17 @@ module.exports = (course, item, callback) => {
         var elements = {};
 
         // Check if any exist
-        var none = true;
-        elementsToKill.forEach(el => {
-            elements[el] = $(`#${el}`);
-            if ($(elements[el]).length !== 0) none = false;
-        });
+        var none = (elementsToKill.some(el => elements[el] = $(`#${el}`)));
 
         // Return if they're all empty
-        if (none === true) {
+        if (none !== true) {
             callback(null, course, item);
             return;
         }
 
+        // There is currently a problem if there are multiple tags in the same document, it will only delete the first one.
         // Replace the specified element with the contents of the element removing the tag
+        // Canvas automatically places a `<p>` tag at the before the img when there is no other tag before
         for (let i = 0; i < elementsToKill.length; i++) {
             $(`#${elementsToKill[i]}`).replaceWith($(`#${elementsToKill[i]}`).contents());
         }
