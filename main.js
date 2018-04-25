@@ -110,12 +110,20 @@ module.exports = (course, stepCallback) => {
         });
     }
 
-    asyncLib.eachSeries(templates, runSeries, (err) => {
-        if (err) {
-            course.error(err);
-            stepCallback(err, course);
-        } else {
-            stepCallback(null, course);
-        }
-    });
+    function startActionSeries() {
+        asyncLib.eachSeries(templates, runSeries, (err) => {
+            if (err) {
+                throw (course.error(err));
+                stepCallback(err, course);
+            } else {
+                stepCallback(null, course);
+            }
+        });
+    }
+
+    try {
+        startActionSeries();
+    } catch (e) {
+        console.log(`lololololololol`);
+    }
 };

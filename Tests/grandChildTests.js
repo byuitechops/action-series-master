@@ -5,7 +5,7 @@ const asyncLib = require('async');
 const cheerio = require('cheerio');
 
 module.exports = (course, callback) => {
-    tap.test('action-series-master', (test) => {
+    tap.test('action-series-master', (tapTest) => {
         function universal_alt_attribute(altAttributeCallback) {
             altAttributeCallback(null);
         }
@@ -90,7 +90,7 @@ module.exports = (course, callback) => {
             if (seriesErr) {
                 course.error(seriesErr);
             }
-            test.end();
+            tapTest.end();
         });
     });
 

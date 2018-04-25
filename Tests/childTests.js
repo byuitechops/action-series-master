@@ -1,5 +1,5 @@
 /* Dependencies */
-const async = require('async');
+const asyncLib = require('async');
 
 const universalTests = require('./grandChildTests.js');
 const assignmentTests = require('../../action-series-assignments/Tests/grandChildTests.js');
@@ -14,20 +14,21 @@ const quizTests = require('../../action-series-quizzes/Tests/grandChildTests.js'
 module.exports = (course, callback) => {
 
     myFunctions = [
-        universalTests(course, callback),
-        assignmentTests(course, callback),
-        discussionTests(course, callback),
-        // fileTests(course, callback);
-        // moduleItemTests(course, callback);
-        // moduleTests(course, callback);
-        // pageTests(course, callback);
-        // quizQuestionTests(course, callback);
-        // quizTests(course, callback);
+        asyncLib.constant(course),
+        // universalTests(course, callback),
+        assignmentTests,
+        discussionTests,
+        // fileTests(course, callback),
+        // moduleItemTests(course, callback),
+        // moduleTests(course, callback),
+        // pageTests(course, callback),
+        // quizQuestionTests,
+        // quizTests,
     ];
 
-    async.waterfall(myFunctions, waterfallErr => {
-        if (seriesErr) {
-            course.error(seriesErr);
+    asyncLib.waterfall(myFunctions, waterfallErr => {
+        if (waterfallErr) {
+            course.error(waterfallErr);
         }
         callback(null, course);
     });
