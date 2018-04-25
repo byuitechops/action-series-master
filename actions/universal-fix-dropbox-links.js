@@ -35,7 +35,7 @@ module.exports = (course, item, callback) => {
      * 
      * This function acts as a driver for the program. It waterfalls 
      * all of the functions and makes sure that they are completed.
-    ******************************************************************/
+     ******************************************************************/
     function beginProcess() {
         // ensure that the arrays are correctly populated before
         // starting the repairLinks grandchild.
@@ -172,7 +172,7 @@ module.exports = (course, item, callback) => {
             return;
             // links are found. let's check each to see if they are dropbox links
         } else {
-            var arr = $(links).filter((i, link) => $(link).attr('href').includes('drop_box'));
+            var arr = $(links).filter((i, link) => $(link).attr('href') && $(link).attr('href').includes('drop_box'));
 
             if (arr.length > 0) {
                 arr.each((index, link) => {
@@ -338,7 +338,7 @@ module.exports = (course, item, callback) => {
                     constructXMLAssigmentsCallback(getAssignmentsErr);
                     return;
                 }
-                
+
                 if (assignments.length === 0) {
                     course.warning('No assignments were found in the course.');
                     // is this supposed to be callback, or constructXMLAssigmentsCallback?
