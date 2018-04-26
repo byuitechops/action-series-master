@@ -24,7 +24,7 @@
   },
   "scripts": {
     "start": "node ./node_modules/child-development-kit/runChild.js",
-    "test": "tap ./node_modules/child-development-kit/testChild.js -T"
+    "test": "tap ./node_modules/child-development-kit/runChild.js -T"
   },
   "repository": {
     "type": "git",
