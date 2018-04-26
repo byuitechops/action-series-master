@@ -1,6 +1,7 @@
 const cheerio = require('cheerio');
 
 module.exports = (course, item, callback) => {
+    try {
     //only add the platforms your grandchild should run in
     var validPlatforms = ['online', 'pathway'];
     var validPlatform = validPlatforms.includes(course.settings.platform);
@@ -78,4 +79,8 @@ module.exports = (course, item, callback) => {
 
     /* Call the callback after running through each link in the item */
     callback(null, course, item);
+} catch (e) {
+    course.error(new Error(e));
+    callback(null, course, item);
+}
 };

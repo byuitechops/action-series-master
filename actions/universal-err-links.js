@@ -55,50 +55,55 @@ var externalResources = [
 ];
 
 module.exports = (course, item, callback) => {
-    //only add the platforms your grandchild should run in
-    var validPlatforms = ['online', 'pathway', 'campus'];
-    var validPlatform = validPlatforms.includes(course.settings.platform);
+    try {
+        //only add the platforms your grandchild should run in
+        var validPlatforms = ['online', 'pathway', 'campus'];
+        var validPlatform = validPlatforms.includes(course.settings.platform);
 
-    /* If the item is marked for deletion or isn't a valid platform type, do nothing */
-    if (item.techops.delete === true || validPlatform !== true) {
-        callback(null, course, item);
-        return;
-    }
-    
-    /* This is the action that happens if the test is passed */
-    function action() {
-        var $ = cheerio.load(item.techops.getHTML(item));
-        var links = $('a');
-        var foundERR;
-        if (links != undefined) {
-            links = links.filter((i, link) => {
-                if ($(link).attr('href') !== undefined) {
-                    return !$(link).attr('href').includes('https://byui.instructure.com');
-                } else {
-                    course.message('Link without href attribute found');
-                    return false;
-                }
-            });
-            links.each(function (i, link) {
-                link = $(link).attr('href').toLowerCase();
-                foundERR = externalResources.find(externalResource => externalResource.test(link));
-                if (foundERR != undefined) {
-                    course.log('ERR Identified', {
-                        'name': foundERR.toString().replace(/\//g, ''),
-                        'url': link,
-                        'item': item.techops.getTitle(item),
-                        'type': item.techops.type
-                    });
-                }
-            });
+        /* If the item is marked for deletion or isn't a valid platform type, do nothing */
+        if (item.techops.delete === true || validPlatform !== true) {
+            callback(null, course, item);
+            return;
         }
-        callback(null, course, item);
-    }
 
-    if (item.techops.getHTML(item) === null) {
+        /* This is the action that happens if the test is passed */
+        function action() {
+            var $ = cheerio.load(item.techops.getHTML(item));
+            var links = $('a');
+            var foundERR;
+            if (links != undefined) {
+                links = links.filter((i, link) => {
+                    if ($(link).attr('href') !== undefined) {
+                        return !$(link).attr('href').includes('https://byui.instructure.com');
+                    } else {
+                        course.message('Link without href attribute found');
+                        return false;
+                    }
+                });
+                links.each(function (i, link) {
+                    link = $(link).attr('href').toLowerCase();
+                    foundERR = externalResources.find(externalResource => externalResource.test(link));
+                    if (foundERR != undefined) {
+                        course.log('ERR Identified', {
+                            'name': foundERR.toString().replace(/\//g, ''),
+                            'url': link,
+                            'item': item.techops.getTitle(item),
+                            'type': item.techops.type
+                        });
+                    }
+                });
+            }
+            callback(null, course, item);
+        }
+
+        if (item.techops.getHTML(item) === null) {
+            callback(null, course, item);
+            return;
+        } else {
+            action();
+        }
+    } catch (e) {
+        course.error(new Error(e));
         callback(null, course, item);
-        return;
-    } else {
-        action();
     }
 };
