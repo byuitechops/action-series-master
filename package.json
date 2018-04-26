@@ -14,7 +14,6 @@
     "action-series-quizzes": "github:byuitechops/action-series-quizzes",
     "async": "^2.6.0",
     "canvas-wrapper": "github:byuitechops/canvas-wrapper",
-    "conversion-reporter": "github:byuitechops/conversion-reporter",
     "logger": "github:byuitechops/logger"
   },
   "devDependencies": {
