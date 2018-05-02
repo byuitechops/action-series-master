@@ -1,7 +1,7 @@
 /****************************************************************************
  * Universal Naming Conventions
  * Description: The purpose of this module is to standardize each item title
- * to match the format 'Wxx _ActivityType_: Activity Name'. Some items have
+ * to match the format 'Wxx Activity_Type: Activity Name'. Some items have
  * special naming conventions and others don't need to be standardized at all
  * (i.e. Items in the Instructor Resources or Student Resources modules).
  * This module will work to rename each item title, except for module titles
@@ -65,9 +65,9 @@ module.exports = (course, item, callback) => {
          * Ex: L1, W02, Lesson 03, Week 4 
          *******************************************************************/
         function removePrefix(title, itemTitleArray) {
-            /* If it is a discussion or quiz AND it already has the prefix 'Wxx _ActivityType_:' then get rid of the prefix */
+            /* If it is a discussion or quiz AND it already has the prefix 'Wxx Activity_Type:' then get rid of the prefix */
             if (item.techops.type === 'Discussion' || item.techops.type === 'Quiz') {
-                if (title.match(/W\d\d\s_ActivityType_:/)) {
+                if (title.match(/W\d\d\sActivity_Type:/)) {
                     itemTitleArray.splice(0, 2);
                     return itemTitleArray.join(' ');
                 }
@@ -119,10 +119,10 @@ module.exports = (course, item, callback) => {
                 newTitle = `W${weekNum} ${item.techops.type}: ${modifiedTitle}`;
                 doChange = true;
                 /* If it doesn't already have the correct prefix, put it on  */
-            } else if ((!title.match(/W\d\d\s_ActivityType_:/)) &&
+            } else if ((!title.match(/W\d\d\sActivity_Type:/)) &&
                 (!title.match(/W\d\d\sDiscussion:/)) &&
                 (!title.match(/W\d\d\sQuiz:/))) {
-                newTitle = `W${weekNum} _ActivityType_: ${modifiedTitle}`;
+                newTitle = `W${weekNum} Activity_Type: ${modifiedTitle}`;
                 doChange = true;
             }
 
@@ -188,6 +188,12 @@ module.exports = (course, item, callback) => {
         /* If it's a quiz or discussion type assignment, skip it because the naming convention will take care */
         /* of it as a quiz or discussion separately, rather than doing it a second time as an assignment */
         if (item.techops.type === 'Assignment' && (item.quiz_id !== undefined || item.discussion_topic !== undefined)) {
+            callback(null, course, item);
+            return;
+        }
+
+        /* If the item is a module item in Instructor Resources, don't apply any changes to it */
+        if (item.techops.type === 'Module Item' && item.techops.getTitle(item) !== undefined && /instructor\s*resources?/i.test(item.techops.parentModule.name)) {
             callback(null, course, item);
             return;
         }
