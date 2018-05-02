@@ -186,7 +186,7 @@ module.exports = (course, item, callback) => {
                 var newUrl = getCanvasUrl(link);
 
                 if (!newUrl) {
-                    course.error(`You may want to look into this course. ${link.d2l.page} appears to be missing from the course.`);
+                    course.warning(`${link.d2l.page} has been removed from it's module for an unknown reason, but still exists in the course.`);
                     return;
                 }
 
