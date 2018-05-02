@@ -25,7 +25,7 @@ module.exports = (course, item, callback) => {
             newTitle: 'Design Workbook'
         }, {
             oldTitle: /^(l|w)\d*\s*lesson\s*\d*\s*notes/gi,
-            newTitle: 'Lesson Notes (Do NOT Publish)'
+            newTitle: 'Teaching Notes (Do NOT Publish)'
         }];
 
         /* The test returns TRUE or FALSE - action() is called if true */
