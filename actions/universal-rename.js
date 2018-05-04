@@ -12,7 +12,7 @@ module.exports = (course, item, callback) => {
 
         /* Pages to be renamed, in LOWER case */
         var itemsToRename = [{
-            oldTitle: /Setup\s*(notes)?(\sfor\sdevelopment\s*team)?/gi,
+            oldTitle: /Setup\s*(notes)?\sfor\sdevelopment\s*team/gi,
             newTitle: '-Setup Notes & Course Settings'
         }, {
             oldTitle: /library\s*research\s*guide/gi,
