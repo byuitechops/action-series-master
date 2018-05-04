@@ -23,6 +23,9 @@ module.exports = (course, item, callback) => {
         }, {
             oldTitle: /^(l|w)\d*\s*lesson\s*\d*\s*notes/gi,
             newTitle: 'Teaching Notes (Do NOT Publish)'
+        }, {
+            oldTitle: /general\s*lesson\s*notes/gi,
+            newTitle: 'General Teaching Notes'
         }];
 
         /* The test returns TRUE or FALSE - action() is called if true */

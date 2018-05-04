@@ -6,13 +6,13 @@ const asyncLib = require('async');
 /* Templates */
 var templates = [
     require('action-series-pages'),
-    require('action-series-module-items'),
     require('action-series-files'),
     require('action-series-modules'),
     require('action-series-assignments'),
     require('action-series-discussions'),
     require('action-series-quizzes'),
     require('action-series-quiz-questions'),
+    require('action-series-module-items'), // run last
 ];
 
 /* Universal item actions */
