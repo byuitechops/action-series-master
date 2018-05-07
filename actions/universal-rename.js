@@ -26,6 +26,12 @@ module.exports = (course, item, callback) => {
         }, {
             oldTitle: /general\s*lesson\s*notes/gi,
             newTitle: 'General Teaching Notes'
+        }, {
+            oldTitle: /\s*\d*\s*(Week|Lesson|L|W)\s*\d*\s*overview\s*$/gi,
+            newTitle: 'Introduction'
+        }, {
+            oldTitle: /overview\s*\d*\s*(Week|Lesson|L|W)\s*\d*\s*$/gi,
+            newTitle: 'Introduction'
         }];
 
         /* The test returns TRUE or FALSE - action() is called if true */
