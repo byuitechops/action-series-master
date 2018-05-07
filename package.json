@@ -14,7 +14,9 @@
     "action-series-quizzes": "github:byuitechops/action-series-quizzes",
     "async": "^2.6.0",
     "canvas-wrapper": "github:byuitechops/canvas-wrapper",
-    "logger": "github:byuitechops/logger"
+    "logger": "github:byuitechops/logger",
+    "quiz-instructions": "github:byuitechops/quiz-instructions",
+    "write-course": "github:byuitechops/write-course"
   },
   "devDependencies": {
     "async": "^2.6.0",

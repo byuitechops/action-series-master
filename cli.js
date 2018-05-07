@@ -3,12 +3,19 @@ const createCourseObject = require('create-course-object');
 const Logger = require('logger');
 const logger = new Logger;
 const canvas = require('canvas-wrapper');
+const indexer = require('index-directory').conversionTool;
+const quizInstructions = require('quiz-instructions');
+const writeCourse = require('write-course');
 const Enquirer = require('enquirer');
 var enquirer = new Enquirer();
 
+function coursePrep() {
+
+}
+
 function buildHeader(course) {
     return `
-        <h2>Course Standards Report</h2>
+        <h2>Course Standards</h2>
         <p>Here are all of the course standards that are currently not being met within the course.</p>
         <p>Course ID: ${course.info.canvasOU}</p>
         <a target="_blank" href="https://byui.instructure.com/courses/${course.info.canvasOU}">https://byui.instructure.com/courses/${course.info.canvasOU}</a>
@@ -17,7 +24,7 @@ function buildHeader(course) {
 
 function getPristine() {
     return new Promise((resolve, reject) => {
-        canvas.get(`/api/v1/accounts/${course.settings.accountID}/courses?search_term=1 (Pristine)`, (getErr, foundCourse) => {
+        canvas.get(`/api/v1/accounts/1/courses?search_term=1 (Pristine)`, (getErr, foundCourse) => {
             if (getErr) return reject(getErr);
             if (foundCourse.length < 1) return reject(new Error('Cannot find Pristine Gauntlet.'));
             resolve(foundCourse[0]);
@@ -27,7 +34,7 @@ function getPristine() {
 
 function getUserCourse(courseID) {
     return new Promise((resolve, reject) => {
-        canvas.get(`/api/v1/accounts/${course.settings.accountID}/courses/${courseID}`, (err, givenCourse) => {
+        canvas.get(`/api/v1/accounts/1/courses/${courseID}`, (err, givenCourse) => {
             if (err) return reject(err);
             resolve(givenCourse[0]);
         });
@@ -44,12 +51,27 @@ function runActionSeries(foundCourse) {
             course.info.canvasOU = foundCourse.id;
             course.info.usedFiles = [];
             course.info.unusedFiles = [];
+            course.info.unzippedPath = './course-unzipped';
+            course.info.processedPath = './course-processed';
 
-            /* Run the action-series model on the course */
-            main(course, (err, courseObject) => {
-                if (err) return reject(err);
-                resolve(courseObject);
+            /* Index the course object */
+            indexer(course, (indexErr, indexedCourse) => {
+                if (indexErr) return reject(indexErr);
+                /* Fix the quiz instructions */
+                quizInstructions(indexedCourse, (quizErr, fixedCourse) => {
+                    if (quizErr) return reject(quizErr);
+                    /* Write the course files */
+                    writeCourse(fixedCourse, (writeErr, writtenCourse) => {
+                        if (writeErr) return reject(writeErr);
+                        /* Run the action-series model on the course */
+                        main(writtenCourse, (err, courseObject) => {
+                            if (err) return reject(err);
+                            resolve(courseObject);
+                        });
+                    })
+                })
             });
+
         });
     });
 }
@@ -73,13 +95,40 @@ getPristine()
     .then(promptUser)
     .then(courseObject => {
         console.log(`${courseObject.info.courseName} completely checked.`);
+
+        // Report Set for Corey's Team
+        courseObject.logger.createReportSet('LMS Team', [
+            'Page - Contains Brightspace References',
+            'Quiz Question - Contains Brightspace References',
+            'Quiz - Contains Brightspace References',
+            'Discussion - Contains Brightspace References',
+            'Assignment - Contains Brightspace References',
+            'Page - Contains Brainhoney References',
+            'Quiz Question - Contains Brainhoney References',
+            'Quiz - Contains Brainhoney References',
+            'Discussion - Contains Brainhoney References',
+            'Assignment - Contains Brainhoney References',
+            'Page - Contains Adobe Connect References',
+            'Quiz Question - Contains Adobe Connect References',
+            'Quiz - Contains Adobe Connect References',
+            'Discussion - Contains Adobe Connect References',
+            'Assignment - Contains Adobe Connect References',
+            'Page - Contains Adobe Flash References',
+            'Quiz Question - Contains Adobe Flash References',
+            'Quiz - Contains Adobe Flash References',
+            'Discussion - Contains Adobe Flash References',
+            'Assignment - Contains Adobe Flash References',
+        ]);
+
         // Set the Report Header
         courseObject.setReportHeader(buildHeader(courseObject));
         // Generate the Console Report
         courseObject.consoleReport();
         // Generate the JSON Report
-        courseObject.jsonReport(`./reports/${courseObject.info.fileName.split('.zip')[0]} Conversion Report.json`);
+        courseObject.jsonReport('./reports');
         // Generate the HTML Report
-        courseObject.htmlReport('./reports', courseObject.info.courseName);
+        courseObject.htmlReport('./reports');
+        // Generate specific report set reports
+        courseObject.htmlReport('./reports', 'LMS Team');
     })
     .catch(console.log);
