@@ -39,14 +39,18 @@ module.exports = (course, item, callback) => {
 
         /* This is the action that happens if the test is passed */
         function action() {
-            var oldTitle = item.techops.getTitle(item);
-            item.techops.setTitle(item, found.newTitle);
-            item.techops.log(`${item.techops.type} - Renamed`, {
-                'Old Title': oldTitle,
-                'New Title': item.techops.getTitle(item),
-                'ID': item.techops.getID(item)
-            });
+            if (item.techops.getTitle(item) !== found.newTitle) {
+                var oldTitle = item.techops.getTitle(item);
+                item.techops.setTitle(item, found.newTitle);
 
+                var categoryTitle = course.info.checkStandards ? `${item.techops.type} - Needs to be Renamed` : `${item.techops.type} - Renamed`;
+
+                item.techops.log(categoryTitle, {
+                    'Old Title': oldTitle,
+                    'New Title': item.techops.getTitle(item),
+                    'ID': item.techops.getID(item)
+                });
+            }
             callback(null, course, item);
         }
 
