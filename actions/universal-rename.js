@@ -21,7 +21,7 @@ module.exports = (course, item, callback) => {
             oldTitle: /copyright\s*(and|&)\s*source\s*/gi,
             newTitle: 'Copyright & Source Information'
         }, {
-            oldTitle: /^(l|w)\d*\s*lesson\s*\d*\s*notes/gi,
+            oldTitle: /^(l|w)?\d*\s*lesson\s*\d*\s*notes/gi,
             newTitle: 'Teaching Notes (Do NOT Publish)'
         }, {
             oldTitle: /general\s*lesson\s*notes/gi,
