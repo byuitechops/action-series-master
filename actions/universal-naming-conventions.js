@@ -149,7 +149,7 @@ module.exports = (course, item, callback) => {
                 /* If it doesn't already have the correct prefix, put it on  */
             } else if ((!title.match(/W\d?\d?\s_ActivityType_:/)) &&
                 (!title.match(/W\d?\d?\sDiscussion:/)) &&
-                (!title.match(/W\d\?d\?sQuiz:/))) {
+                (!title.match(/W\d?\d?\sQuiz:/))) {
                 newTitle = `W${weekNum} _ActivityType_: ${modifiedTitle}`;
                 doChange = true;
             } 
@@ -218,7 +218,7 @@ module.exports = (course, item, callback) => {
         /* An array of module items NOT to change */
         var skipItems = [
             /orientation\s*to\s*online\s*learning/gi,
-            /syllabus/gi,
+            /^\s*syllabus\s*$/gi,
         ];
 
         var title = item.techops.getTitle(item);
