@@ -54,7 +54,7 @@ module.exports = (course, item, callback) => {
             callback(null, course, item);
         }
 
-        if (found != undefined) {
+        if (found != undefined && item.techops.type !== 'File') {
             action();
         } else {
             callback(null, course, item);
