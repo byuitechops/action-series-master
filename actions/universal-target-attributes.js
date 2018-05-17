@@ -49,13 +49,9 @@ module.exports = (course, item, callback) => {
                         }
                     }
                 });
-            } else {
-                callback(null, course, item);
-                return;
+                /* Set the new html of the put item */
+                item.techops.setHTML(item, $.html());
             }
-
-            /* Set the new html of the put item */
-            item.techops.setHTML(item, $.html());
 
             /* Next item or grandchild module */
             callback(null, course, item);
