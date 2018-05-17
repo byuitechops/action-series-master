@@ -12,25 +12,25 @@ module.exports = (course, item, callback) => {
 
         /* Pages to be renamed, in LOWER case */
         var itemsToRename = [{
-            oldTitle: /Setup\s*(notes)?\sfor\sdevelopment\s*team/gi,
+            oldTitle: /Setup\s*(notes)?\sfor\sdevelopment\s*team/i,
             newTitle: '-Setup Notes & Course Settings'
         }, {
-            oldTitle: /library\s*research\s*guide/gi,
+            oldTitle: /library\s*research\s*guide/i,
             newTitle: 'Library Research Guides'
         }, {
-            oldTitle: /copyright\s*(and|&)\s*source\s*/gi,
+            oldTitle: /copyright\s*(and|&)\s*source\s*/i,
             newTitle: 'Copyright & Source Information'
         }, {
-            oldTitle: /^(l|w)?\d*\s*lesson\s*\d*\s*notes/gi,
+            oldTitle: /^(l|w)?\d*\s*lesson\s*\d*\s*notes/i,
             newTitle: 'Teaching Notes (Do NOT Publish)'
         }, {
-            oldTitle: /general\s*lesson\s*notes/gi,
+            oldTitle: /general\s*lesson\s*notes/i,
             newTitle: 'General Teaching Notes'
         }, {
-            oldTitle: /\s*\d*\s*(Week|Lesson|L|W)\s*\d*\s*overview\s*$/gi,
+            oldTitle: /\s*\d*\s*(Week|Lesson|L|W)\s*\d*\s*overview\s*$/i,
             newTitle: 'Introduction'
         }, {
-            oldTitle: /overview\s*\d*\s*(Week|Lesson|L|W)\s*\d*\s*$/gi,
+            oldTitle: /overview\s*\d*\s*(Week|Lesson|L|W)\s*\d*\s*$/i,
             newTitle: 'Introduction'
         }];
 
