@@ -51,6 +51,7 @@ module.exports = (course, item, callback) => {
                 });
             } else {
                 callback(null, course, item);
+                return;
             }
 
             /* Set the new html of the put item */
