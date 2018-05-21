@@ -27,7 +27,7 @@ module.exports = (course, item, callback) => {
             oldTitle: /general\s*lesson\s*notes/i,
             newTitle: 'General Teaching Notes'
         }, {
-            oldTitle: /\s*\d*\s*(Week|Lesson|L|W)\s*\d*\s*overview\s*$/i,
+            oldTitle: /\s*\d*\s*(Week|Lesson|L|W)\s*\d*\D?\d*\s*overview\s*$/i,
             newTitle: 'Introduction'
         }, {
             oldTitle: /overview\s*\d*\s*(Week|Lesson|L|W)\s*\d*\s*$/i,

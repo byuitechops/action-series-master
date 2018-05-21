@@ -12,6 +12,12 @@ module.exports = (course, item, callback) => {
         var validPlatforms = ['online', 'pathway', 'campus'];
         var validPlatform = validPlatforms.includes(course.settings.platform);
 
+        /* If the item isn't a valid platform, is marked for deletion, or the setting to run it is turned off, then return */
+        if (item.techops.delete === true || validPlatform !== true || course.settings.targetAttributes === false) {
+            callback(null, course, item);
+            return;
+        }
+
         /* This is the action that happens if the test is passed */
         function action() {
             var $ = cheerio.load(item.techops.getHTML(item));
@@ -49,20 +55,17 @@ module.exports = (course, item, callback) => {
                         }
                     }
                 });
+                /* Set the new html of the put item */
+                item.techops.setHTML(item, $.html());
             }
 
-            /* Set the new html of the put item */
-            item.techops.setHTML(item, $.html());
 
             /* Next item or grandchild module */
             callback(null, course, item);
         }
 
-        /* If the item is marked for deletion, do nothing */
-        if (course.settings.targetAttributes === false ||
-            item.techops.delete === true ||
-            validPlatform !== true ||
-            item.techops.getHTML(item) === null ||
+        /* If the item is has no html, or it is the home page, do nothing */
+        if (item.techops.getHTML(item) === null ||
             (item.techops.type === 'Page' && item.front_page === true)) {
             callback(null, course, item);
             return;
