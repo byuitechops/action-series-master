@@ -16,7 +16,7 @@ var templates = [
 ];
 
 /* Universal item actions */
-var universal = [
+var defaultUniversal = [
     require('./actions/universal-styling-div.js'),
     require('./actions/universal-html-deprecated-tags.js'),
     require('./actions/universal-rename.js'),
@@ -34,6 +34,13 @@ var universal = [
 ];
 
 module.exports = (course, stepCallback) => {
+
+    if (course.info.data && course.info.data.fullActionSeries) {
+        var universal = course.info.data.fullActionSeries.filter(grandchild => grandchild.includes('universal'));
+        universal = universal.map(grandchild => require(`./actions/${grandchild}.js`));
+    } else {
+        var universal = defaultUniversal;
+    }
 
     function runSeries(template, seriesCallback) {
 
@@ -66,11 +73,22 @@ module.exports = (course, stepCallback) => {
             /* Copy of the item so we can see if any changes were made in the grandchildren modules*/
             var originalItem = Object.assign({}, item);
 
+            if (course.info.data && course.info.data.fullActionSeries) {
+                var templateActions = course.info.data.fullActionSeries.reduce((acc, grandchild) => {
+                    if (template.prefix && grandchild.includes(template.prefix)) {
+                        acc.push(require(`./node_modules/action-series-${template.prefix}/actions/${grandchild}.js`));
+                    }
+                    return acc;
+                }, []);
+            } else {
+                var templateActions = template.actions;
+            }
+
             /* Builds a full list of all the actions to run on the item.
              * The first function is just to inject the needed values into the waterfall.
              * "universal" adds in the grandchildren that need to run on every category.
              * "template.actions" adds in the category's grandchildren. */
-            var actions = [asyncLib.constant(course, item), ...universal, ...template.actions];
+            var actions = [asyncLib.constant(course, item), ...universal, ...templateActions];
 
             setTimeout(() => {
                 asyncLib.waterfall(actions, (waterErr, course, finalItem) => {
@@ -109,6 +127,8 @@ module.exports = (course, stepCallback) => {
             });
         });
     }
+
+
 
     asyncLib.eachSeries(templates, runSeries, (err) => {
         if (err) {
