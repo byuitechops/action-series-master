@@ -121,7 +121,7 @@ module.exports = (course, item, callback) => {
                         var url = $(link).attr('href');
 
                         //get the ID and XML properties
-                        if (url.includes(check)) {
+                        if (url && url.includes(check)) {
                             var obj = matchXMLPages(url, url.split('/').pop());
 
                             //check to see if obj is empty object
@@ -246,7 +246,9 @@ module.exports = (course, item, callback) => {
             //multiple links appear in the same page.
             brokenLinks.forEach((element) => {
                 links.attr('href', (i, link) => {
-                    return link.replace(element.badLink, element.newLink);
+                    if (link) {
+                        return link.replace(element.badLink, element.newLink);
+                    }
                 });
 
                 //for report tracking
