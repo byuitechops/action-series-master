@@ -102,3 +102,7 @@ module.exports = (course, item, callback) => {
         callback(null, course, item);
     }
 };
+
+module.exports.details = {
+    title: 'universal-fix-equella-links'
+};
