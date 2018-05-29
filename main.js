@@ -2,6 +2,7 @@
 /* Collects all of the pages and runs them through a series of tests and changes to switch them to new standards */
 
 const asyncLib = require('async');
+const path = require('path');
 
 /* Templates */
 var templates = [
@@ -37,7 +38,7 @@ module.exports = (course, stepCallback) => {
 
     if (course.info.data && course.info.data.fullActionSeries) {
         var universal = course.info.data.fullActionSeries.filter(grandchild => grandchild.includes('universal'));
-        universal = universal.map(grandchild => require(`./actions/${grandchild}.js`));
+        universal = universal.map(grandchild => require(path.resolve('.', `/actions/${grandchild}.js`)));
     } else {
         var universal = defaultUniversal;
     }
@@ -76,7 +77,7 @@ module.exports = (course, stepCallback) => {
             if (course.info.data && course.info.data.fullActionSeries) {
                 var templateActions = course.info.data.fullActionSeries.reduce((acc, grandchild) => {
                     if (template.prefix && grandchild.includes(template.prefix)) {
-                        acc.push(require(`./node_modules/action-series-${template.prefix}/actions/${grandchild}.js`));
+                        acc.push(require(path.resolve('.', `/node_modules/action-series-${template.prefix}/actions/${grandchild}.js`)));
                     }
                     return acc;
                 }, []);
