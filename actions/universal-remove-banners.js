@@ -68,3 +68,7 @@ module.exports = (course, item, callback) => {
         callback(null, course, file);
     }
 };
+
+module.exports.details = {
+    title: 'universal-remove-banners'
+};

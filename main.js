@@ -2,6 +2,7 @@
 /* Collects all of the pages and runs them through a series of tests and changes to switch them to new standards */
 
 const asyncLib = require('async');
+const path = require('path');
 
 /* Templates */
 var templates = [
@@ -36,8 +37,8 @@ var defaultUniversal = [
 module.exports = (course, stepCallback) => {
 
     if (course.info.data && course.info.data.fullActionSeries) {
-        var universal = course.info.data.fullActionSeries.filter(grandchild => grandchild.includes('universal'));
-        universal = universal.map(grandchild => require(`./actions/${grandchild}.js`));
+        var selectedUniversal = course.info.data.fullActionSeries.filter(grandchild => grandchild.includes('universal'));
+        universal = defaultUniversal.filter(module => selectedUniversal.includes(module.details.title));
     } else {
         var universal = defaultUniversal;
     }
@@ -74,12 +75,8 @@ module.exports = (course, stepCallback) => {
             var originalItem = Object.assign({}, item);
 
             if (course.info.data && course.info.data.fullActionSeries) {
-                var templateActions = course.info.data.fullActionSeries.reduce((acc, grandchild) => {
-                    if (template.prefix && grandchild.includes(template.prefix)) {
-                        acc.push(require(`./node_modules/action-series-${template.prefix}/actions/${grandchild}.js`));
-                    }
-                    return acc;
-                }, []);
+                var selectedActions = course.info.data.fullActionSeries.filter(grandchild => grandchild.includes(template.prefix));
+                var templateActions = template.actions.filter(action => selectedActions.includes(action.details.title));
             } else {
                 var templateActions = template.actions;
             }
@@ -127,8 +124,6 @@ module.exports = (course, stepCallback) => {
             });
         });
     }
-
-
 
     asyncLib.eachSeries(templates, runSeries, (err) => {
         if (err) {
