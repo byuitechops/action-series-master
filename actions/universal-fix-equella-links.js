@@ -55,7 +55,7 @@ module.exports = (course, item, callback) => {
                         'Title': item.techops.getTitle(item),
                         'ID': item.techops.getID(item),
                         'URL': tempUrl,
-                        'Old Target': oldUrl,
+                        'Old URL': oldUrl,
                     });
                 }
             });
@@ -82,7 +82,7 @@ module.exports = (course, item, callback) => {
                     'Title': item.techops.getTitle(item),
                     'ID': item.techops.getID(item),
                     'URL': item.external_url,
-                    'Old Target': oldUrl,
+                    'Old URL': oldUrl,
                 });
             }
             callback(null, course, item);
