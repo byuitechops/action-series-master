@@ -20,17 +20,10 @@ var canvasPagesArray = [];
 
 module.exports = (course, item, callback) => {
     try {
-        var validPlatforms = ['online', 'pathway', 'campus'];
-        var validPlatform = validPlatforms.includes(course.settings.platform);
-
         var pageLink = false;
-        var validPlatforms = [
-            'online'
-        ];
 
         if (item.techops.delete === true ||
-            item.techops.getHTML(item) === null ||
-            validPlatform !== true) {
+            item.techops.getHTML(item) === null) {
 
             callback(null, course, item);
             return;

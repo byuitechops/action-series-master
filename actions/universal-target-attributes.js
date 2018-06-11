@@ -8,12 +8,8 @@ const cheerio = require('cheerio');
 
 module.exports = (course, item, callback) => {
     try {
-        /* Only add the platforms your grandchild should run in */
-        var validPlatforms = ['online', 'pathway', 'campus'];
-        var validPlatform = validPlatforms.includes(course.settings.platform);
-
-        /* If the item isn't a valid platform, is marked for deletion, or the setting to run it is turned off, then return */
-        if (item.techops.delete === true || validPlatform !== true || course.settings.targetAttributes === false) {
+        /* If the item is marked for deletion, or the setting to run it is turned off, then return */
+        if (item.techops.delete === true || course.settings.targetAttributes === false) {
             callback(null, course, item);
             return;
         }

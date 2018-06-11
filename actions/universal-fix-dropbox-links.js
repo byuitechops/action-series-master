@@ -19,12 +19,9 @@ var canvasAssignments = [];
 
 module.exports = (course, item, callback) => {
     try {
-        // only add the platforms your grandchild should run in
-        var validPlatforms = ['online', 'pathway', 'campus'];
-        var validPlatform = validPlatforms.includes(course.settings.platform);
 
         // no need to check items that will be deleted
-        if (item.techops.delete === true || item.techops.getHTML(item) === null || validPlatform !== true) {
+        if (item.techops.delete === true || item.techops.getHTML(item) === null) {
             callback(null, course, item);
             return;
         }
