@@ -22,13 +22,17 @@ module.exports = (course, item, callback) => {
             courseCode = courseCode.toLowerCase().replace(/\s+/g, '');
             courseCode = courseCode.replace(/:/g, '');
 
+            if (course.info.instructorEmail) {
+                courseCode += `-${course.info.instructorEmail.split('@')[0]}`;
+            }
+
             /* If this already contains the styling, just skip it */
-            if ($(`.byui.${courseCode}`).length > 0) {
+            if ($(`.byui.${courseCode} `).length > 0) {
                 callback(null, course, item);
                 return;
             }
 
-            $('body').html(`<div class="byui ${courseCode}">${$.html()}</div>`);
+            $('body').html(`< div class="byui ${courseCode}" > ${$.html()}</div > `);
 
             item.techops.setHTML(item, $('body').html());
 
