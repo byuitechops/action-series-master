@@ -34,6 +34,9 @@ module.exports = (course, item, callback) => {
             }, {
                 reg: /<style>/g,
                 type: 'Inline Styling'
+            }, {
+                reg: /box\.(com)|(net)/g,
+                type: 'Box Website'
             }];
 
             /* Check each regex to see if the item contents has any matches */
