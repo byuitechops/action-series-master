@@ -43,6 +43,7 @@ module.exports = (course, item, callback) => {
                 if (checkArraysErr) {
                     course.error(checkArraysErr);
                     callback(null, course, item);
+                    return;
                 }
 
                 checkPages();

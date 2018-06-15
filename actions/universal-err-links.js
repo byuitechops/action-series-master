@@ -57,9 +57,6 @@ var externalResources = [
 module.exports = (course, item, callback) => {
     try {
 
-
-
-
         /* If the item is marked for deletion, do nothing */
         if (item.techops.delete === true) {
             callback(null, course, item);
