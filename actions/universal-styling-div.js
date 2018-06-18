@@ -32,7 +32,7 @@ module.exports = (course, item, callback) => {
                 return;
             }
 
-            $('body').html(`< div class="byui ${courseCode}" > ${$.html()}</div > `);
+            $('body').html(`<div class="byui ${courseCode}"> ${$.html()}</div>`);
 
             item.techops.setHTML(item, $('body').html());
 
