@@ -19,7 +19,6 @@
     "write-course": "github:byuitechops/write-course"
   },
   "devDependencies": {
-    "async": "^2.6.0",
     "child-development-kit": "git+https://github.com/byuitechops/child-development-kit.git",
     "tap": "^10.7.3"
   },
