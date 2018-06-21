@@ -1,17 +1,11 @@
 const main = require('./main.js');
 const createCourseObject = require('create-course-object');
-const Logger = require('logger');
-const logger = new Logger;
 const canvas = require('canvas-wrapper');
 const indexer = require('index-directory').conversionTool;
 const quizInstructions = require('quiz-instructions');
 const writeCourse = require('write-course');
 const Enquirer = require('enquirer');
 var enquirer = new Enquirer();
-
-function coursePrep() {
-
-}
 
 function buildHeader(course) {
     return `
@@ -24,7 +18,7 @@ function buildHeader(course) {
 
 function getPristine() {
     return new Promise((resolve, reject) => {
-        canvas.get(`/api/v1/accounts/1/courses?search_term=1 (Pristine)`, (getErr, foundCourse) => {
+        canvas.get('/api/v1/accounts/1/courses?search_term=1 (Pristine)', (getErr, foundCourse) => {
             if (getErr) return reject(getErr);
             if (foundCourse.length < 1) return reject(new Error('Cannot find Pristine Gauntlet.'));
             resolve(foundCourse[0]);
@@ -68,8 +62,8 @@ function runActionSeries(foundCourse) {
                             if (err) return reject(err);
                             resolve(courseObject);
                         });
-                    })
-                })
+                    });
+                });
             });
 
         });

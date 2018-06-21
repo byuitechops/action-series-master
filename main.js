@@ -2,7 +2,6 @@
 /* Collects all of the pages and runs them through a series of tests and changes to switch them to new standards */
 
 const asyncLib = require('async');
-const path = require('path');
 
 /* Templates */
 var templates = [
@@ -73,12 +72,13 @@ module.exports = (course, stepCallback) => {
 
             /* Copy of the item so we can see if any changes were made in the grandchildren modules*/
             var originalItem = Object.assign({}, item);
+            var templateActions;
 
             if (course.info.data && course.info.data.fullActionSeries) {
                 var selectedActions = course.info.data.fullActionSeries.filter(grandchild => grandchild.includes(template.prefix));
-                var templateActions = template.actions.filter(action => selectedActions.includes(action.details.title));
+                templateActions = template.actions.filter(action => selectedActions.includes(action.details.title));
             } else {
-                var templateActions = template.actions;
+                templateActions = template.actions;
             }
 
             /* Builds a full list of all the actions to run on the item.
