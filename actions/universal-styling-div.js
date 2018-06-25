@@ -21,6 +21,7 @@ module.exports = (course, item, callback) => {
             courseCode = courseCode[0] + courseCode[1];
             courseCode = courseCode.toLowerCase().replace(/\s+/g, '');
             courseCode = courseCode.replace(/:/g, '');
+            courseCode = courseCode.replace(/.zip/g, '');
 
             if (course.info.instructorEmail) {
                 courseCode += `-${course.info.instructorEmail.split('@')[0]}`;
