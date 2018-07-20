@@ -3,9 +3,6 @@ const cheerio = require('cheerio');
 module.exports = (course, item, callback) => {
     try {
 
-
-
-
         /* If the item is marked for deletion, do nothing */
         if (item.techops.delete === true) {
             callback(null, course, item);
@@ -25,21 +22,21 @@ module.exports = (course, item, callback) => {
 
             /* Filters to the html tags with no attributes nad no text */
             function toNoTextNoAttr(i, ele) {
-                return Object.keys(ele.attribs).length === 0 && $(ele).text() === '';
+                return Object.keys(ele.attribs).length === 0 && $(ele).text() === '' && $(ele).children().length === 0;
             }
 
             /* Create cheerio object and search them with FUNCTION and remove those*/
             arrayOfTags.forEach(function (element) {
+                item.techops.log(logCategory, {
+                    'Title': item.techops.getTitle(item),
+                    'ID': item.techops.getID(item),
+                    'Tag': element.tagName
+                });
                 $(element).filter(toNoTextNoAttr).remove();
             });
 
             /* Set the HTML to exclude the deleted parts */
             item.techops.setHTML(item, $.html());
-
-            item.techops.log(logCategory, {
-                'Title': item.techops.getTitle(item),
-                'ID': item.techops.getID(item),
-            });
 
             callback(null, course, item);
         }
