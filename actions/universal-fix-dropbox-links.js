@@ -285,7 +285,9 @@ module.exports = (course, item, callback) => {
             // if needed.
             brokenLinks.forEach((element) => {
                 links.attr('href', (index, link) => {
-                    return link.replace(element.badLink, element.newLink);
+                    if (link) {
+                        return link.replace(element.badLink, element.newLink);
+                    }
                 });
 
                 // log to make life easier for everyone
